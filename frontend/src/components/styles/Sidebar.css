@@ -1,0 +1,111 @@
+.sidebar {
+    width: 80px;
+    height: 100vh;
+    background-color: #11101d;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    color: white;
+    transition: width 0.5s ease-in-out;
+    overflow: hidden;
+    /* Evita que el contenido cause el movimiento */
+}
+
+.sidebar.expanded {
+    width: 250px;
+}
+
+.navbar-brand {
+    color: white !important;
+    text-align: center;
+    width: 100%;
+    font-size: 1.5rem;
+    margin: 0;
+    /* Elimina márgenes que puedan causar desplazamiento */
+    padding: 0;
+    /* Asegura que no haya padding adicional */
+    transition: opacity 0.3s ease;
+}
+
+.logo-icon {
+    font-size: 2rem;
+    color: white;
+}
+
+.search-box input {
+    background-color: #1d1b31;
+    border: none;
+    color: white;
+    padding: 10px;
+    width: 80%;
+    margin: 10px auto;
+    display: block;
+}
+
+.search-box input::placeholder {
+    color: #aaa;
+}
+
+.nav-link {
+    color: white !important;
+    padding: 10px 20px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    /* Elimina márgenes adicionales */
+    transition: background-color 0.3s ease, justify-content 0.3s ease, padding 0.3s ease;
+}
+
+.sidebar.expanded .nav-link {
+    justify-content: start;
+}
+
+.nav-link i {
+    margin-right: 0;
+    font-size: 1.5rem;
+    color: white;
+    transition: margin-right 0.3s ease;
+}
+
+.sidebar.expanded .nav-link i {
+    margin-right: 10px;
+    color: white;
+}
+
+.nav-link:hover {
+    background-color: #575a89;
+}
+
+.navbar-nav .nav-item {
+    width: 100%;
+    text-align: center;
+}
+
+.profile-section {
+    background-color: #1d1b31;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+    height: 60px;
+    /* Altura fija para evitar cambios */
+    overflow: hidden;
+    /* Evita que el contenido extra cambie el layout */
+    transition: height 0.3s ease;
+    /* Transición suave para la altura */
+}
+
+.profile-info {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.profile-info.expanded {
+    max-height: 40px;
+    /* Altura suficiente para mostrar el nombre */
+}
