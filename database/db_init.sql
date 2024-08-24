@@ -81,6 +81,6 @@ CREATE TABLE CancionPlaylist (
     id_cancion INT NOT NULL,
     id_playlist INT NOT NULL,
     -- constraints
-    CONSTRAINT PlaylistSong_FK_Playlist FOREIGN KEY (id_playlist) REFERENCES Playlists(id),
+    CONSTRAINT PlaylistSong_FK_Playlist FOREIGN KEY (id_playlist) REFERENCES Playlist(id),
     CONSTRAINT PlaylistSong_FK_Song FOREIGN KEY (id_cancion) REFERENCES Cancion(id)
 );
