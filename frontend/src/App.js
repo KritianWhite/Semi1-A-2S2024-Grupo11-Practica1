@@ -7,6 +7,10 @@ import LoginPage from "./pages/login/LoginPages";
 import RegistrarPage from "./pages/login/RegistrarPage";
 import HomeAdmin from "./pages/administrador/HomePage";
 import HomeSuscriptor from "./pages/suscriptor/HomePage";
+import Perfil from "./pages/Perfil";
+import Playlist from "./pages/Playlist";
+import Favoritos from "./pages/Favoritos";
+import Radio from "./pages/Radio";
 
 function App() {
   return (
@@ -17,6 +21,10 @@ function App() {
           <Route path="/Registrar" element={<RegistrarPage />} />
           <Route path="/HomeAdmin" element={<HomeAdmin />} />
           <Route path="/HomeSuscriptor" element={<HomeSuscriptor />} />
+          <Route path="/Perfil" element={<Perfil />} />
+          <Route path="/Playlist" element={<Playlist />} />
+          <Route path="/Favoritos" element={<Favoritos />} />
+          <Route path="/Radio" element={<Radio />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </Router>
