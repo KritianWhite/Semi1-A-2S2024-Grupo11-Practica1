@@ -1,4 +1,7 @@
 -- SCRIPT DATABASE INITIALIZATION  MYSQL
+-- CASE: Entidades - PascalCase - Singular
+--       Columnas -  snake_case
+--       Constraints -  snake_case
 
 -- eliminar la base de datos si existe
 DROP DATABASE IF EXISTS SOUNDSTREAM;
@@ -12,77 +15,72 @@ USE SOUNDSTREAM;
 
 
 -- Table: Type Users
-CREATE TABLE TypeUser (
+CREATE TABLE TipoUsuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL
+    nombre VARCHAR(20) NOT NULL
 );
 
 -- Table: Users
-CREATE TABLE Users (
+CREATE TABLE Usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    lastname VARCHAR(50) NOT NULL,
-    photo VARCHAR(100) NOT NULL, -- ruta de la foto en el bucket de S3
-    password VARCHAR(70) NOT NULL,
-    email VARCHAR(50) NOT NULL,
-    birthdate DATE NOT NULL,
-    role INT NOT NULL,
+    nombre VARCHAR(65) NOT NULL,
+    apellido VARCHAR(65) NOT NULL,
+    url_imagen VARCHAR(100) NOT NULL, -- ruta de la foto en el bucket de S3
+    password VARCHAR(80) NOT NULL,
+    email VARCHAR(65) NOT NULL,
+    nacimiento DATE NOT NULL,
+    id_tipo_usuario INT NOT NULL,
     -- constraints
-    CONSTRAINT User_FK_TypeUser FOREIGN KEY (role) REFERENCES TypeUser(id)
+    CONSTRAINT Usuario_FK_TipoUsuario FOREIGN KEY (id_tipo_usuario) REFERENCES TipoUsuario(id)
 );
 
 -- create user admin
 
-INSERT INTO TypeUser (name) VALUES ('admin');
-INSERT INTO TypeUser (name) VALUES ('user');
-INSERT INTO Users (name, lastname, photo, password, email, birthdate,role) VALUES ('admin', 'admin', 'https://avatars.githubusercontent.com/u/88564832?v=4','admin', 'admin@gmail.com', '2000-01-01',1);
+INSERT INTO TipoUsuario (nombre) VALUES ('Administrador');
+INSERT INTO TipoUsuario (nombre) VALUES ('Usuario');
+INSERT INTO Usuario (nombre, apellido, url_imagen, password, email, nacimiento,id_tipo_usuario) VALUES ('admin', 'admin', 'https://avatars.githubusercontent.com/u/88564832?v=4','admin', 'admin@gmail.com', '2000-01-01',1);
 
--- Table: Artists
-CREATE TABLE Artists (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    bio TEXT NOT NULL
-);
 
 -- Table: Songs
 
-CREATE TABLE Songs (
+CREATE TABLE Cancion (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    duration INT NOT NULL,
-    file VARCHAR(100) NOT NULL, -- ruta del archivo mp3 en el bucket de S3
-    cover VARCHAR(100) NOT NULL, -- ruta de la foto en el bucket de S3
-    artist_id INT NOT NULL,
-    -- constraints
-    CONSTRAINT Song_FK_Artist FOREIGN KEY (artist_id) REFERENCES Artists(id)
+    nombre VARCHAR(65) NOT NULL,
+    duracion TIME NOT NULL,
+    url_caratula VARCHAR(100) NOT NULL, -- ruta de la imagen en el bucket de S3
+    url_mp3 VARCHAR(100) NOT NULL, -- ruta del archivo en el bucket de S3
+    artista VARCHAR (65) NOT NULL
 );
 
--- Table: LikedSongs
 
-CREATE TABLE LikedSongs (
+-- Table: Favoritos
+CREATE TABLE Favorito (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    song_id INT NOT NULL,
+    id_usuario INT NOT NULL,
+    id_cancion INT NOT NULL,
     -- constraints
-    CONSTRAINT LikedSong_FK_User FOREIGN KEY (user_id) REFERENCES Users(id),
-    CONSTRAINT LikedSong_FK_Song FOREIGN KEY (song_id) REFERENCES Songs(id)
+    CONSTRAINT Favorito_FK_Usuario FOREIGN KEY (id_usuario) REFERENCES Usuario(id),
+    CONSTRAINT Favorito_FK_Cancion FOREIGN KEY (id_cancion) REFERENCES Cancion(id)
 );
 
--- Table: Playlists
-CREATE TABLE Playlists (
+-- Table: Playlist
+CREATE TABLE Playlist (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    user_id INT NOT NULL,
+    nombre VARCHAR(65) NOT NULL,
+    descripcion VARCHAR(100) NOT NULL,
+    url_portada VARCHAR(100) NOT NULL, -- ruta de la imagen en el bucket de S3
+    id_user INT NOT NULL,
+    eliminada BOOLEAN NOT NULL,
     -- constraints
-    CONSTRAINT Playlist_FK_User FOREIGN KEY (user_id) REFERENCES Users(id)
+    CONSTRAINT Playlist_FK_Usuario FOREIGN KEY (id_user) REFERENCES Usuario(id)
 );
 
--- Table: PlaylistSongs
-CREATE TABLE PlaylistSongs (
+-- Table: CancionPlaylist
+CREATE TABLE CancionPlaylist (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    playlist_id INT NOT NULL,
-    song_id INT NOT NULL,
+    id_cancion INT NOT NULL,
+    id_playlist INT NOT NULL,
     -- constraints
-    CONSTRAINT PlaylistSong_FK_Playlist FOREIGN KEY (playlist_id) REFERENCES Playlists(id),
-    CONSTRAINT PlaylistSong_FK_Song FOREIGN KEY (song_id) REFERENCES Songs(id)
+    CONSTRAINT PlaylistSong_FK_Playlist FOREIGN KEY (id_playlist) REFERENCES Playlists(id),
+    CONSTRAINT PlaylistSong_FK_Song FOREIGN KEY (id_cancion) REFERENCES Cancion(id)
 );
