@@ -21,7 +21,7 @@ const AdminPage = () => {
           <Col xs={isExpanded ? 9 : 11}
             className={`transition-col content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`} style={{ transition: 'all 0.5s ease-in-out'}}>
             {/* Aquí va contenido principal */}
-            <h1>Contenido Principal</h1>
+            <h1>Contenido Principal Home Admin</h1>
             <p>Este es el contenido de la página que se adapta al tamaño del sidebar.</p>
 
             {/* Reproductor fijo en la parte inferior */}
