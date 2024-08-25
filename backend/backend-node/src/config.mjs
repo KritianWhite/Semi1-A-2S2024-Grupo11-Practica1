@@ -14,8 +14,5 @@ export default {
     port: process.env.PORT || 0,
     database: process.env.DATABASE || "",
     userdatab: process.env.USERDATAB || "",
-    password: process.env.PASSWORD || "",
-    myToken: process.env.TOKEN_SECRET || "",
-	refreshToken: process.env.REFRESH_TOKEN || "",
-    //key_password: process.env.kEY_PASSWORD  || ""
+    password: process.env.PASSWORD || ""
 };

@@ -41,12 +41,12 @@ const login = async (req, res) => {
 
 const registro = async (req, res) => {
   try {
-    const { nombres, apellidos, url_imagen, email, password, nacimiento } =
+    const { nombre, apellido, url_imagen, email, password, nacimiento } =
       req.body;
 
     if (
-      nombres === undefined ||
-      apellidos === undefined ||
+      nombre === undefined ||
+      apellido === undefined ||
       url_imagen === undefined ||
       email === undefined ||
       password === undefined ||
@@ -58,17 +58,28 @@ const registro = async (req, res) => {
       });
     }
     const hash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-    //console.log(bcrypt.hashSync("1234", bcrypt.genSaltSync(10)));
 
-    const xsql = `insert into usuario (nombres, apellidos, url_imagen, email, password, nacimiento, id_tipo_usuario) 
-      values ('${nombres}', '${apellidos}', '${url_imagen}', '${email}', '${hash}', '${nacimiento}', 2);`;
+    const check = await consult(
+      `select exists (select *from usuario where email= '${email}') as userExists;`
+    );
 
-    const result = await consult(xsql);
+    if (check[0].status == 200 && check[0].result[0].userExists == 0) {
+      const xsql = `insert into usuario (nombre, apellido, url_imagen, email, password, nacimiento, id_tipo_usuario) 
+      values ('${nombre}', '${apellido}', '${url_imagen}', '${email}', '${hash}', '${nacimiento}', 2);`;
 
-    if (result[0].status == 200) {
-      return res.status(200).json({ message: "Usuario registrado" });
+      const result = await consult(xsql);
+
+      if (result[0].status == 200) {
+        return res.status(200).json({ message: "Usuario registrado" });
+      } else {
+        return res
+          .status(500)
+          .json({ status: 500, message: result[0].message });
+      }
     } else {
-      return res.status(500).json({ status: 500, message: result[0].message });
+      return res
+        .status(500)
+        .json({ status: 500, message: "Email ya ha sido registrado" });
     }
   } catch (error) {
     console.log(error);
@@ -93,8 +104,8 @@ const getuser = async (req, res) => {
     if (result[0].status == 200 && result[0].result.length > 0) {
       let dateObj = new Date(result[0].result[0].nacimiento);
       const dataUser = {
-        nombres: result[0].result[0].nombres,
-        apellidos: result[0].result[0].apellidos,
+        nombre: result[0].result[0].nombre,
+        apellido: result[0].result[0].apellido,
         url_imagen: result[0].result[0].url_imagen,
         email: result[0].result[0].email,
         nacimiento: dateObj.toISOString().split("T")[0],
@@ -114,11 +125,11 @@ const getuser = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { id, nombres, apellidos, url_imagen, email, password } = req.body;
+    const { id, nombre, apellido, url_imagen, email, password } = req.body;
     if (
       id === undefined ||
-      nombres === undefined ||
-      apellidos === undefined ||
+      nombre === undefined ||
+      apellido === undefined ||
       url_imagen === undefined ||
       email === undefined ||
       password === undefined
@@ -133,18 +144,26 @@ const update = async (req, res) => {
     const result = await consult(xsql);
 
     if (result[0].status == 200 && result[0].result.length > 0) {
-        let checkPass = bcrypt.compareSync(password, result[0].result[0].password);
-        if (checkPass) {
-            xsql = `update usuario set nombres = '${nombres}', apellidos = '${apellidos}', url_imagen = '${url_imagen}', email = '${email}' where id = ${id};`;
-            const result = await consult(xsql);
-            if (result[0].status == 200) {
-                return res.status(200).json({ message: "Usuario actualizado" });
-            } else {
-                return res.status(500).json({ status: 500, message: result[0].message });
-            }
+      let checkPass = bcrypt.compareSync(
+        password,
+        result[0].result[0].password
+      );
+      if (checkPass) {
+        xsql = `update usuario set nombre = '${nombre}', apellido = '${apellido}', url_imagen = '${url_imagen}', email = '${email}' where id = ${id};`;
+
+        const result = await consult(xsql);
+        if (result[0].status == 200) {
+          return res.status(200).json({ message: "Usuario actualizado" });
         } else {
-            return res.status(500).json({ status: 500, message: "Password Incorrecto" });
+          return res
+            .status(500)
+            .json({ status: 500, message: result[0].message });
         }
+      } else {
+        return res
+          .status(500)
+          .json({ status: 500, message: "Password Incorrecto" });
+      }
     } else {
       return res
         .status(500)
