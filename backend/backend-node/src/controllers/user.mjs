@@ -1,5 +1,10 @@
 import * as bcrypt from "bcrypt";
 import { consult } from "../database/database.mjs";
+import config from "../config.mjs";
+
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import fs from "fs";
+import path from "path";
 
 const login = async (req, res) => {
   try {
@@ -41,13 +46,13 @@ const login = async (req, res) => {
 
 const registro = async (req, res) => {
   try {
-    const { nombre, apellido, url_imagen, email, password, nacimiento } =
+    const { nombre, apellido, imagen, email, password, nacimiento } =
       req.body;
 
     if (
       nombre === undefined ||
       apellido === undefined ||
-      url_imagen === undefined ||
+      imagen === undefined ||
       email === undefined ||
       password === undefined ||
       nacimiento === undefined
@@ -57,20 +62,36 @@ const registro = async (req, res) => {
         message: "Solicitud incorrecta. Por favor, rellene todos los campos.",
       });
     }
-    const hash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+
 
     const check = await consult(
       `select exists (select *from usuario where email= '${email}') as userExists;`
     );
 
-    if (check[0].status == 200 && check[0].result[0].userExists == 0) {
+    if (check[0].status == 200 && check[0].result[0].userExists == 0) { //si no existe el usuario
+      //subir imagen a S3
+      const base64Data = imagen.replace(/^data:image\/\w+;base64,/, '');
+      const buff = Buffer.from(base64Data, 'base64');
+      const path = `Fotos/${email}.jpg`;
+
+      const response = await uploadImageS3(buff, path);
+
+      if (response == null) {
+        return res.status(500).json({ status: 500, message: "Error al subir imagen en S3" });
+      }
+
+      const url_imagen = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
+
+      const hash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+
+      //almacenamos la url de la imagen en la base de datos
       const xsql = `insert into usuario (nombre, apellido, url_imagen, email, password, nacimiento, id_tipo_usuario) 
       values ('${nombre}', '${apellido}', '${url_imagen}', '${email}', '${hash}', '${nacimiento}', 2);`;
 
       const result = await consult(xsql);
 
       if (result[0].status == 200) {
-        return res.status(200).json({ message: "Usuario registrado" });
+        return res.status(200).json({status:200, message: "Usuario registrado" });
       } else {
         return res
           .status(500)
@@ -174,6 +195,32 @@ const update = async (req, res) => {
     return res.status(500).json({ status: 500, message: error.message });
   }
 };
+
+//recibe un buffer y lo sube a S3
+const uploadImageS3 = async (buff, path) => {
+  const client = new S3Client({
+    region: config.region,
+    credentials: {
+      accessKeyId: config.accessKeyId,
+      secretAccessKey: config.secretAccessKey,
+    },
+  });
+
+  const command = new PutObjectCommand({
+    Bucket: config.bucket,
+    Key: path,
+    Body: buff,
+    ContentType: "image/jpeg",
+  });
+
+  try {
+    const response = await client.send(command);
+    return response;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
 
 export const user = {
   login,

@@ -44,7 +44,7 @@ const LoginForm = () => {
 
                 <Form.Group controlId="formBasicCheckbox" className="mb-3 d-flex justify-content-between">
                     <Form.Check type="checkbox" label="Recordar mis credenciales" />
-                    <a href="/Registrar" className="text-primary">Registrarse</a>
+                    <a href="/Registrarse" className="text-primary">Registrarse</a>
                 </Form.Group>
 
                 <Button variant="primary" type="submit" className="w-100" style={{
