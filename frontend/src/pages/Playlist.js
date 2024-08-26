@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 
+import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
 import Reproductor from '../components/Reproductor';
 
 const Playlist = () => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const { isAdmin } = UseAuth();
 
     return (
         <>
@@ -15,7 +17,7 @@ const Playlist = () => {
                         className={`p-0 transition-col sidebar-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
                         onMouseEnter={() => setIsExpanded(true)}
                         onMouseLeave={() => setIsExpanded(false)} style={{ transition: 'all 0.5s ease-in-out' }}>
-                        <Sidebar isAdmin={true} />
+                        <Sidebar isAdmin={isAdmin} />
                     </Col>
                     <Col xs={isExpanded ? 9 : 11}
                         className={`transition-col content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`} style={{ transition: 'all 0.5s ease-in-out' }}>
