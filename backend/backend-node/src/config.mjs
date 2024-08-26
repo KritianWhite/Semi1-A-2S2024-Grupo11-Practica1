@@ -14,5 +14,12 @@ export default {
     port: process.env.PORT || 0,
     database: process.env.DATABASE || "",
     userdatab: process.env.USERDATAB || "",
-    password: process.env.PASSWORD || ""
+    password: process.env.PASSWORD || "",
+    // credenciales S3
+    accessKeyId: process.env.ACCESS_KEY_ID || "",
+    secretAccessKey: process.env.SECRET_ACCESS_KEY || "",
+    region: process.env.REGION || "",
+    bucket: process.env.BUCKET || ""
 };
+
+
