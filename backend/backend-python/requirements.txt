@@ -1,3 +1,13 @@
-Flask
-python-dotenv
-flask-cors
+primero activar un entorno virtual en la carpeta raiz "backend-python"
+py -3 -m venv .venv
+luego activarlo
+.venv\Scripts\activate
+
+ya activado se descargan las dependencias
+pip install Flask
+pip install python-dotenv
+pip install flask-cors
+pip install bcrypt
+pip install mysql-connector-python
+
+archivo .env va en la raiz de la carpeta backend-python antes de src
