@@ -25,7 +25,7 @@ CREATE TABLE Usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(65) NOT NULL,
     apellido VARCHAR(65) NOT NULL,
-    url_imagen VARCHAR(100) NOT NULL, -- ruta de la foto en el bucket de S3
+    url_imagen VARCHAR(200) NOT NULL, -- ruta de la foto en el bucket de S3
     password VARCHAR(80) NOT NULL,
     email VARCHAR(65) NOT NULL,
     nacimiento DATE NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE Usuario (
 
 INSERT INTO TipoUsuario (nombre) VALUES ('Administrador');
 INSERT INTO TipoUsuario (nombre) VALUES ('Usuario');
-INSERT into usuario(nombres, apellido, url_imagen, password, email, nacimiento, id_tipo_usuario) values ("admin", "admin", "https://avatars.githubusercontent.com/u/88564832?v=4", "$2b$10$ONxary/UUgA1pEFVvwjVye16gQpwK2xQpGNK5SFn4.EEEe7sF9Br6", "admin@gmail.com", "1998-08-01", 1);
+INSERT into usuario(nombre, apellido, url_imagen, password, email, nacimiento, id_tipo_usuario) values ("admin", "admin", "https://avatars.githubusercontent.com/u/88564832?v=4", "$2b$10$ONxary/UUgA1pEFVvwjVye16gQpwK2xQpGNK5SFn4.EEEe7sF9Br6", "admin@gmail.com", "1998-08-01", 1);
 
 -- Table: Songs
 
@@ -46,8 +46,8 @@ CREATE TABLE Cancion (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(65) NOT NULL,
     duracion TIME NOT NULL,
-    url_caratula VARCHAR(100) NOT NULL, -- ruta de la imagen en el bucket de S3
-    url_mp3 VARCHAR(100) NOT NULL, -- ruta del archivo en el bucket de S3
+    url_caratula VARCHAR(200) NOT NULL, -- ruta de la imagen en el bucket de S3
+    url_mp3 VARCHAR(200) NOT NULL, -- ruta del archivo en el bucket de S3
     artista VARCHAR (65) NOT NULL
 );
 
@@ -67,7 +67,7 @@ CREATE TABLE Playlist (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(65) NOT NULL,
     descripcion VARCHAR(100) NOT NULL,
-    url_portada VARCHAR(100) NOT NULL, -- ruta de la imagen en el bucket de S3
+    url_portada VARCHAR(200) NOT NULL, -- ruta de la imagen en el bucket de S3
     id_user INT NOT NULL,
     eliminada BOOLEAN NOT NULL,
     -- constraints
