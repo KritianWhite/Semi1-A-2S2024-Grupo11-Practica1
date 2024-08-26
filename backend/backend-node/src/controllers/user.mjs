@@ -27,6 +27,7 @@ const login = async (req, res) => {
       if (checkPass) {
         const dataUser = {
           iduser: result[0].result[0].id,
+          role: result[0].result[0].id_tipo_usuario,
         };
         return res.status(200).json(dataUser);
       } else {

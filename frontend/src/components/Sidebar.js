@@ -2,10 +2,15 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Nav, Image, Row, Col } from 'react-bootstrap';
 import './styles/Sidebar.css'; // Archivo CSS personalizado
+import UseAuth from '../pages/auxiliares/UseAuth';
 
 const Sidebar = ({ isAdmin }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const HomeRoute = isAdmin ? '/HomeAdmin' : '/HomeSuscriptor';
+    const { logout } = UseAuth();
+
+    const handleLogout = () => {
+        logout();
+    }
 
     return (
         <Navbar
@@ -22,7 +27,7 @@ const Sidebar = ({ isAdmin }) => {
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="flex-column w-100">
                     <Nav.Item>
-                        <Nav.Link as={Link} to={HomeRoute} className="d-flex align-items-center">
+                        <Nav.Link as={Link} to="/Inicio" className="d-flex align-items-center">
                             <i className="bi bi-house-door"></i>
                             {isExpanded && <span>Inicio</span>}
                         </Nav.Link>
@@ -71,7 +76,7 @@ const Sidebar = ({ isAdmin }) => {
                 </Col>
                 {isExpanded && (
                     <Col xs="auto" className="d-flex align-items-center">
-                        <Link to="/logout" className="text-white">
+                        <Link to="/Login" onClick={handleLogout} className="text-white">
                             <i className="bi bi-box-arrow-right" style={{ fontSize: '1.5rem' }}></i>
                         </Link>
                     </Col>
