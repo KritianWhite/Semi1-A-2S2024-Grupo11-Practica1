@@ -7,7 +7,33 @@ import Alertas from '../Alertas';
 
 function RegisterForm() {
   const [errors, setErrors] = useState({});
+  const [base64, setBase64] = useState("");
   const navigate = useNavigate();
+
+  const handleImageUpload = (event) => {
+
+    const file = event.target.files[0];
+
+    if (file) {
+      //asegurarse de que el archivo no sea mayor a 5MB
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors({
+          formProfilePicture: 'El archivo seleccionado es demasiado grande'
+        });
+      }
+
+      //asegurarse de que el archivo sea jpg, jpeg o png
+      if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+        setErrors({ formProfilePicture: 'El archivo seleccionado no tiene un formato valido' });
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBase64(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -26,8 +52,34 @@ function RegisterForm() {
       setErrors(formErrors);
     } else {
       setErrors({});
-      Alertas.showToast('Tu cuenta ha sido creada con éxito', 'success');
-      navigate('/Login');
+      // Petición a la API para registrar al usuario
+      fetch('http://localhost:4000/user/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre: form.elements.formFirstName.value,
+          apellido: form.elements.formLastName.value,
+          imagen: base64,
+          email: form.elements.formEmail.value,
+          password: form.elements.formPassword.value,
+          nacimiento: form.elements.formBirthDate.value,
+        })
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status !== 200) {
+            Alertas.showToast(data.message, 'error');
+          } else {
+            Alertas.showToast(data.message, 'success');
+            navigate('/Login');
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          Alertas.showToast(error, 'error');
+        });
     }
   };
 
@@ -62,6 +114,8 @@ function RegisterForm() {
         <Form.Control
           type="file"
           isInvalid={!!errors.formProfilePicture}
+          accept="image/*"
+          onChange={handleImageUpload}
         />
         <Form.Control.Feedback type="invalid">
           {errors.formProfilePicture}
