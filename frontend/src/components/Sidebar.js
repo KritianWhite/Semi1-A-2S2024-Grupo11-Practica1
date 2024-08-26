@@ -58,7 +58,7 @@ const Sidebar = ({ isAdmin }) => {
                     </Nav.Item>
                     {isAdmin && (
                         <Nav.Item>
-                            <Nav.Link as={Link} to="/administrador" className="d-flex align-items-center">
+                            <Nav.Link as={Link} to="/dashboard-admin" className="d-flex align-items-center">
                                 <i className="bi bi-gear"></i>
                                 {isExpanded && <span>Administrador</span>}
                             </Nav.Link>

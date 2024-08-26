@@ -3,6 +3,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 
 import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
+import PerfilForm from '../components/PerfilForm';
 import Reproductor from '../components/Reproductor';
 
 const Perfil = () => {
@@ -13,26 +14,43 @@ const Perfil = () => {
         <>
             <Container fluid>
                 <Row>
-                    <Col xs={isExpanded ? 3 : 1}
+                    <Col
+                        xs={isExpanded ? 3 : 1}
                         className={`p-0 transition-col sidebar-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
                         onMouseEnter={() => setIsExpanded(true)}
-                        onMouseLeave={() => setIsExpanded(false)} style={{ transition: 'all 0.5s ease-in-out' }}>
+                        onMouseLeave={() => setIsExpanded(false)}
+                        style={{ transition: 'all 0.5s ease-in-out' }}
+                    >
                         <Sidebar isAdmin={isAdmin} />
                     </Col>
-                    <Col xs={isExpanded ? 9 : 11}
-                        className={`transition-col content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`} style={{ transition: 'all 0.5s ease-in-out' }}>
+                    <Col
+                        xs={isExpanded ? 9 : 11}
+                        className={`transition-col content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
+                        style={{ transition: 'all 0.5s ease-in-out', overflowX: 'hidden' }}
+                    >
                         {/* Aquí va contenido principal */}
-                        <h1>Contenido Principal Perfil</h1>
-                        <p>Este es el contenido de la página que se adapta al tamaño del sidebar.</p>
+                        <div className="d-flex justify-content-center align-items-center min-vh-100" style={{ overflow: 'hidden' }}>
+                            <PerfilForm />
+                        </div>
 
                         {/* Reproductor fijo en la parte inferior */}
-                        <div style={{ position: 'fixed', bottom: 0, left: isExpanded ? '250px' : '80px', right: 0, transition: 'left 0.5s ease-in-out', zIndex: 1000 }}>
+                        <div
+                            style={{
+                                position: 'fixed',
+                                bottom: 0,
+                                left: isExpanded ? '250px' : '80px',
+                                right: 0,
+                                transition: 'left 0.5s ease-in-out',
+                                zIndex: 1000,
+                            }}
+                        >
                             <Reproductor />
                         </div>
                     </Col>
                 </Row>
             </Container>
         </>
+
     );
 }
 
