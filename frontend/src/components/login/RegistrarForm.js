@@ -172,6 +172,9 @@ function RegisterForm() {
       <Button variant="primary" type="submit" className="w-100">
         Registrarse
       </Button>
+      <br/>
+      <br/>
+      <a href="/Login" className="text-primary">Iniciar sesión</a>
     </Form>
   );
 }
