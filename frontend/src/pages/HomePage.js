@@ -8,8 +8,8 @@ import Reproductor from '../components/Reproductor';
 
 const AdminPage = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { hasAccessToRoute } = UseAuth();
-  const location = useLocation();
+  const {userId, isAdmin,  hasAccessToRoute } = UseAuth();
+  const location = useLocation(); 
 
   // Si el usuario no tiene acceso a la ruta actual, redirige a una página de error o a la página principal
   if (!hasAccessToRoute(location.pathname)) {
@@ -24,7 +24,7 @@ const AdminPage = () => {
             className={`p-0 transition-col sidebar-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
             onMouseEnter={() => setIsExpanded(true)}
             onMouseLeave={() => setIsExpanded(false)} style={{ transition: 'all 0.5s ease-in-out' }}>
-            <Sidebar isAdmin={true} />
+            <Sidebar isAdmin={isAdmin} />
           </Col>
           <Col xs={isExpanded ? 9 : 11}
             className={`transition-col content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`} style={{ transition: 'all 0.5s ease-in-out' }}>

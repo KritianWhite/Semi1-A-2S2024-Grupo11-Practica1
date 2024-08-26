@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const useAuth = () => {
+const UseAuth = () => {
     const [authData, setAuthData] = useState({ userId: null, isAdmin: false });
 
     useEffect(() => {
@@ -44,4 +44,4 @@ const useAuth = () => {
     };
 };
 
-export default useAuth;
+export default UseAuth;
