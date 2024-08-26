@@ -5,27 +5,29 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 
 import LoginPage from "./pages/login/LoginPages";
 import RegistrarPage from "./pages/login/RegistrarPage";
-import HomeAdmin from "./pages/administrador/HomePage";
-import HomeSuscriptor from "./pages/suscriptor/HomePage";
+import HomeAdmin from "./pages/HomePage";
 import Perfil from "./pages/Perfil";
 import Playlist from "./pages/Playlist";
 import Favoritos from "./pages/Favoritos";
 import Radio from "./pages/Radio";
+import TrackLocation from "./pages/auxiliares/TrackLocation";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
     <>
       <Router>
+        <TrackLocation />
         <Routes>
           <Route path="/Login" element={<LoginPage />} />
-          <Route path="/Registrar" element={<RegistrarPage />} />
-          <Route path="/HomeAdmin" element={<HomeAdmin />} />
-          <Route path="/HomeSuscriptor" element={<HomeSuscriptor />} />
+          <Route path="/Registrarse" element={<RegistrarPage />} />
+          <Route path="/Inicio" element={<HomeAdmin />} />
           <Route path="/Perfil" element={<Perfil />} />
           <Route path="/Playlist" element={<Playlist />} />
           <Route path="/Favoritos" element={<Favoritos />} />
           <Route path="/Radio" element={<Radio />} />
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="/404" element={<NotFound />} />
+          <Route path="*" element={<Navigate to="/404" />} />
         </Routes>
       </Router>
     </>
