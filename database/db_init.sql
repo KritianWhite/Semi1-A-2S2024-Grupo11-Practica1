@@ -38,7 +38,7 @@ CREATE TABLE Usuario (
 
 INSERT INTO TipoUsuario (nombre) VALUES ('Administrador');
 INSERT INTO TipoUsuario (nombre) VALUES ('Usuario');
-INSERT into usuario(nombre, apellido, url_imagen, password, email, nacimiento, id_tipo_usuario) values ("admin", "admin", "https://avatars.githubusercontent.com/u/88564832?v=4", "$2b$10$ONxary/UUgA1pEFVvwjVye16gQpwK2xQpGNK5SFn4.EEEe7sF9Br6", "admin@gmail.com", "1998-08-01", 1);
+INSERT into usuario(nombre, apellido, url_imagen, password, email, nacimiento, id_tipo_usuario) values ("admin", "admin", "https://avatars.githubusercontent.com/u/88564832?v=4", "$2b$10$efrHvtfyHaEVf3exaBaBQuMysCtmoVsW8MZLWG9maetujFN.ybsIO", "admin@gmail.com", "1998-08-01", 1);
 
 -- Table: Songs
 
