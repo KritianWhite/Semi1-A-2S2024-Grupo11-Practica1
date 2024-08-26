@@ -10,6 +10,7 @@ import Perfil from "./pages/Perfil";
 import Playlist from "./pages/Playlist";
 import Favoritos from "./pages/Favoritos";
 import Radio from "./pages/Radio";
+import DashboardAdmin from "./pages/DashboardAdmin";
 import TrackLocation from "./pages/auxiliares/TrackLocation";
 import NotFound from "./pages/NotFound";
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="/Playlist" element={<Playlist />} />
           <Route path="/Favoritos" element={<Favoritos />} />
           <Route path="/Radio" element={<Radio />} />
+          <Route path="/dashboard-admin" element={<DashboardAdmin />} />
           <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<Navigate to="/404" />} />
         </Routes>

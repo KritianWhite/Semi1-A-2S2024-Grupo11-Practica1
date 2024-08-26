@@ -27,7 +27,7 @@ const useAuth = () => {
 
     const hasAccessToRoute = (route) => {
         const adminRoutes = [
-            '/admin-dashboard',
+            '/dashboard-admin',
         ];
 
         if (adminRoutes.includes(route) && !authData.isAdmin) {

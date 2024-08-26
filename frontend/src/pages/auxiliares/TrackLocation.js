@@ -14,6 +14,7 @@ const TrackLocation = () => {
             '/playlist',
             '/favoritos',
             '/radio',
+            '/dashboard-admin'
         ];
         const currentPath = location.pathname.toLowerCase(); // Convierte la ruta a minúsculas
         // Verifica si la ruta actual (en minúsculas) es válida
