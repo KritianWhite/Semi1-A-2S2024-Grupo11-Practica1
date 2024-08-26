@@ -27,12 +27,17 @@ const LoginForm = () => {
         })
             .then(response => response.json())
             .then(data => {
-                if(data.role === 1){
-                    login(data.id, true);
-                    navigate('/Inicio');
-                }else if(data.role === 2){
-                    login(data.id, false);
-                    navigate('/Inicio');
+                //validar status 200
+                if(data.status !== 200){
+                    Alertas.showToast(data.message, 'error');
+                }else{
+                    if(data.role === 1){
+                        login(data.id, true);
+                        navigate('/Inicio');
+                    }else if(data.role === 2){
+                        login(data.id, false);
+                        navigate('/Inicio');
+                    }
                 }
             })
             .catch((error) => {

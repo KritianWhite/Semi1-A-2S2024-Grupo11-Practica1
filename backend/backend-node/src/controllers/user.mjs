@@ -29,7 +29,7 @@ const login = async (req, res) => {
           iduser: result[0].result[0].id,
           role: result[0].result[0].id_tipo_usuario,
         };
-        return res.status(200).json(dataUser);
+        return res.status(200).json({status: 200, iduser: dataUser.iduser, role: dataUser.role});
       } else {
         return res
           .status(409)
