@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, ListGroup, Button, Form } from 'react-bootstrap';
+import Alertas from './Alertas';
 
 const PerfilForm = ({ data }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -15,6 +16,34 @@ const PerfilForm = ({ data }) => {
   };
 
   const [formData, setFormData] = useState({ ...defaultData, ...data });
+
+    useEffect(() => {
+        //obtenemos la informacion del usuario desde el local storage
+        const storedAuthData = JSON.parse(localStorage.getItem('authData'));
+
+        //si no hay informacion del usuario redirigimos al login
+        if (!storedAuthData.userId) { 
+            window.location.href = '/login';
+        }
+
+        //obtenemos la informacion del usuario haciendo una peticion al servidor
+        fetch(`http://localhost:4000/user/getuser`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: storedAuthData.userId })
+        })
+            .then((response) => response.json())
+            .then( (data) => {
+                setFormData(data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                Alertas.showToast('Ocurrío un error al cargar la información', 'error');
+            });
+    }, []);
+
 
   useEffect(() => {
     // Actualizar los datos si data cambia
