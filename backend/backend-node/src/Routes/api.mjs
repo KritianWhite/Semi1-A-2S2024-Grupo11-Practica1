@@ -11,6 +11,7 @@ router.post("/user/login", user.login);
 router.post("/user/register", user.registro);
 router.post("/user/getuser", user.getuser);
 router.post("/user/update", user.update);
+router.post("/user/updatephoto", user.updatephoto);
 
 /*****Canciones****/
 router.post("/song/create", song.create);
