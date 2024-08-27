@@ -125,11 +125,10 @@ def update():
         user_id = data.get('id')
         nombre = data.get('nombre')
         apellido = data.get('apellido')
-        url_imagen = data.get('url_imagen')
-        email = data.get('email')
         password = data.get('password')
+        nacimiento = data.get('nacimiento')
 
-        if not all([user_id, nombre, apellido, url_imagen, email, password]):
+        if not all([user_id, nombre, apellido, nacimiento, password]):
             return jsonify({"status": 404, "message": "Solicitud incorrecta. Por favor, rellene todos los campos."}), 404
 
         xsql = f"SELECT * FROM usuario WHERE id = '{user_id}'"
@@ -140,18 +139,74 @@ def update():
 
             if check_pass:
                 xsql = (f"UPDATE usuario SET nombre = '{nombre}', apellido = '{apellido}', "
-                        f"url_imagen = '{url_imagen}', email = '{email}' WHERE id = {user_id};")
+                        f"nacimiento = '{nacimiento}' WHERE id = {user_id};")
 
                 result = consult(xsql)
 
                 if result[0]['status'] == 200:
-                    return jsonify({"message": "Usuario actualizado"}), 200
+                    return jsonify({"status":200, "message": "Usuario actualizado"}), 200
                 else:
                     return jsonify({"status": 500, "message": result[0]['message']}), 500
             else:
                 return jsonify({"status": 500, "message": "Password Incorrecto"}), 500
         else:
             return jsonify({"status": 500, "message": "error usuario no existe"}), 500
+    except Exception as e:
+        print(e)
+        return jsonify({"status": 500, "message": str(e)}), 500
+    
+def updatephoto():
+    try:
+        data = request.json
+        user_id = data.get('id')
+        imagen = data.get('imagen')
+        password = data.get('password')
+        email = data.get('email')
+
+        if not all([user_id, imagen, password, email]):
+            return jsonify({"status": 404, "message": "Solicitud incorrecta. Por favor, rellene todos los campos."}), 404
+
+        #validamos la contraseña
+        xsql = f"SELECT * FROM usuario WHERE id = '{user_id}' and email = '{email}'"
+        result = consult(xsql)
+
+        if result[0]['status'] == 200 and len(result[0]['result']) > 0:
+            check_pass = bcrypt.checkpw(password.encode('utf-8'), result[0]['result'][0]['password'].encode('utf-8'))
+
+            if not check_pass:
+                return jsonify({"status": 409, "message": "Password Incorrecto"}), 409
+        else:
+            return jsonify({"status": 500, "message": "error usuario no existe"}), 500
+        
+        #subir imagen a s3
+        base64Data = re.sub(r'^data:image/\w+;base64,', '', imagen)
+        buff = base64.b64decode(base64Data)
+        fechaHoraActual = datetime.datetime.now()
+        ano = str(fechaHoraActual.year)
+        mes = str(fechaHoraActual.month).zfill(2)  # Se usa zfill para agregar ceros a la izquierda
+        dia = str(fechaHoraActual.day).zfill(2)
+        hora = str(fechaHoraActual.hour).zfill(2)
+        minutos = str(fechaHoraActual.minute).zfill(2)
+        segundos = str(fechaHoraActual.second).zfill(2)
+
+        fechaHoraNumerica = f"{ano}{mes}{dia}{hora}{minutos}{segundos}"
+        path = f"Fotos/{email + fechaHoraNumerica}.jpg"
+        
+        response = uploadImageS3(buff, path)
+
+        if response is None:
+            return jsonify({"status": 500, "message": "Error al subir la imagen en S3"}), 500
+
+        url_imagen = f"https://{config['bucket']}.s3.{config['region']}.amazonaws.com/{path}"
+
+        xsql = f"UPDATE usuario SET url_imagen = '{url_imagen}' WHERE id = {user_id};"
+
+        result = consult(xsql)
+
+        if result[0]['status'] == 200:
+            return jsonify({"status":200, "message": "Foto actualizada"}), 200
+        else:
+            return jsonify({"status": 500, "message": result[0]['message']}), 500
     except Exception as e:
         print(e)
         return jsonify({"status": 500, "message": str(e)}), 500
@@ -185,5 +240,6 @@ user = {
     "login": login,
     "registro": registro,
     "getuser": getuser,
-    "update": update
+    "update": update,
+    "updatephoto": updatephoto
 }
