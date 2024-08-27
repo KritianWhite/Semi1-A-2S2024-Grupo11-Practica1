@@ -3,8 +3,6 @@ import { consult } from "../database/database.mjs";
 import config from "../config.mjs";
 
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import fs from "fs";
-import path from "path";
 
 const login = async (req, res) => {
   try {
@@ -29,7 +27,7 @@ const login = async (req, res) => {
           iduser: result[0].result[0].id,
           role: result[0].result[0].id_tipo_usuario,
         };
-        return res.status(200).json(dataUser);
+        return res.status(200).json({ status: 200, iduser: dataUser.iduser, role: dataUser.role });
       } else {
         return res
           .status(409)
@@ -47,8 +45,7 @@ const login = async (req, res) => {
 
 const registro = async (req, res) => {
   try {
-    const { nombre, apellido, imagen, email, password, nacimiento } =
-      req.body;
+    const { nombre, apellido, imagen, email, password, nacimiento } = req.body;
 
     if (
       nombre === undefined ||
@@ -64,21 +61,33 @@ const registro = async (req, res) => {
       });
     }
 
-
     const check = await consult(
       `select exists (select *from usuario where email= '${email}') as userExists;`
     );
 
-    if (check[0].status == 200 && check[0].result[0].userExists == 0) { //si no existe el usuario
+    if (check[0].status == 200 && check[0].result[0].userExists == 0) {
+      //si no existe el usuario
       //subir imagen a S3
-      const base64Data = imagen.replace(/^data:image\/\w+;base64,/, '');
-      const buff = Buffer.from(base64Data, 'base64');
-      const path = `Fotos/${email}.jpg`;
+      const base64Data = imagen.replace(/^data:image\/\w+;base64,/, "");
+      const buff = Buffer.from(base64Data, "base64");
+      const fechaHoraActual = new Date();
+      const ano = fechaHoraActual.getFullYear().toString();
+      const mes = (fechaHoraActual.getMonth() + 1).toString().padStart(2, '0'); // Se agrega +1 porque los meses se indexan desde 0
+      const dia = fechaHoraActual.getDate().toString().padStart(2, '0');
+      const hora = fechaHoraActual.getHours().toString().padStart(2, '0');
+      const minutos = fechaHoraActual.getMinutes().toString().padStart(2, '0');
+      const segundos = fechaHoraActual.getSeconds().toString().padStart(2, '0');
+
+      const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
+
+      const path = `Fotos/${email+fechaHoraNumerica}.jpg`;
 
       const response = await uploadImageS3(buff, path);
 
       if (response == null) {
-        return res.status(500).json({ status: 500, message: "Error al subir imagen en S3" });
+        return res
+          .status(500)
+          .json({ status: 500, message: "Error al subir imagen en S3" });
       }
 
       const url_imagen = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
@@ -92,7 +101,9 @@ const registro = async (req, res) => {
       const result = await consult(xsql);
 
       if (result[0].status == 200) {
-        return res.status(200).json({status:200, message: "Usuario registrado" });
+        return res
+          .status(200)
+          .json({ status: 200, message: "Usuario registrado" });
       } else {
         return res
           .status(500)
@@ -147,14 +158,13 @@ const getuser = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { id, nombre, apellido, url_imagen, email, password } = req.body;
+    const { id, nombre, apellido, nacimiento, password } = req.body;
     if (
       id === undefined ||
       nombre === undefined ||
       apellido === undefined ||
-      url_imagen === undefined ||
-      email === undefined ||
-      password === undefined
+      password === undefined ||
+      nacimiento === undefined
     ) {
       return res.status(404).json({
         status: 404,
@@ -162,20 +172,22 @@ const update = async (req, res) => {
       });
     }
 
-    let xsql = `select *from usuario where id = '${id}'`;
-    const result = await consult(xsql);
-
-    if (result[0].status == 200 && result[0].result.length > 0) {
+    //verificar password
+    let resultCheck = await consult(
+      `SELECT * FROM usuario where id = '${id}'`
+    );
+    if (resultCheck[0].status == 200 && resultCheck[0].result.length > 0) { //si existe el usuario
       let checkPass = bcrypt.compareSync(
         password,
-        result[0].result[0].password
-      );
-      if (checkPass) {
-        xsql = `update usuario set nombre = '${nombre}', apellido = '${apellido}', url_imagen = '${url_imagen}', email = '${email}' where id = ${id};`;
+        resultCheck[0].result[0].password
+      ); //comparamos el password
 
+      if (checkPass) {
+        //actualizar usuario
+        let xsql = `update usuario set nombre = '${nombre}', apellido = '${apellido}', nacimiento = '${nacimiento}' where id = ${id};`;
         const result = await consult(xsql);
         if (result[0].status == 200) {
-          return res.status(200).json({ message: "Usuario actualizado" });
+          return res.status(200).json({ status: 200, message: "Usuario actualizado" });
         } else {
           return res
             .status(500)
@@ -183,8 +195,75 @@ const update = async (req, res) => {
         }
       } else {
         return res
+          .status(409)
+          .json({ status: 409, message: "Password Incorrecto" });
+      }
+    } else {
+      return res
+        .status(500)
+        .json({ status: 500, message: "usuario no existe" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: 500, message: error.message });
+  }
+};
+
+const updatephoto = async (req, res) => {
+  try {
+    const { id, email, imagen, password } = req.body;
+    if (id === undefined || email === undefined || imagen === undefined || password === undefined) {
+      return res.status(404).json({
+        status: 404,
+        message: "Solicitud incorrecta. Por favor, rellene todos los campos.",
+      });
+    }
+
+    let xsql = `select * from usuario where id = '${id}' and email = '${email}';`;
+    const result = await consult(xsql);
+
+    if (result[0].status == 200 && result[0].result.length > 0) {
+      //verificamos el password
+      let checkPass = bcrypt.compareSync(password, result[0].result[0].password);
+
+      if (!checkPass) {
+        return res
+          .status(409)
+          .json({ status: 409, message: "Password Incorrecto" });
+      }
+
+      const base64Data = imagen.replace(/^data:image\/\w+;base64,/, "");
+      const buff = Buffer.from(base64Data, "base64");
+      const fechaHoraActual = new Date();
+      const ano = fechaHoraActual.getFullYear().toString();
+      const mes = (fechaHoraActual.getMonth() + 1).toString().padStart(2, '0'); // Se agrega +1 porque los meses se indexan desde 0
+      const dia = fechaHoraActual.getDate().toString().padStart(2, '0');
+      const hora = fechaHoraActual.getHours().toString().padStart(2, '0');
+      const minutos = fechaHoraActual.getMinutes().toString().padStart(2, '0');
+      const segundos = fechaHoraActual.getSeconds().toString().padStart(2, '0');
+
+      const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
+
+      const path = `Fotos/${email+fechaHoraNumerica}.jpg`;
+
+      const response = await uploadImageS3(buff, path);
+
+      if (response == null) {
+        return res
           .status(500)
-          .json({ status: 500, message: "Password Incorrecto" });
+          .json({ status: 500, message: "Error al subir imagen en S3" });
+      }
+
+      let url_imagen = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
+
+      xsql = `update usuario set url_imagen = '${url_imagen}' where id = ${id};`;
+      const result2 = await consult(xsql);
+      if (result2[0].status == 200) {
+        return res.status(200).json({status:200, message: "Foto de perfil actualizada" });
+      } else {
+        return res
+          .status(500)
+          .json({ status: 500, message: result2[0].message });
       }
     } else {
       return res
@@ -221,11 +300,12 @@ const uploadImageS3 = async (buff, path) => {
     console.error(error);
     return null;
   }
-}
+};
 
 export const user = {
   login,
   registro,
   getuser,
   update,
+  updatephoto,
 };
