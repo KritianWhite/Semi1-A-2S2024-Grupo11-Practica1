@@ -1,0 +1,75 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.808);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding-left: 5vh;
+  }
+  
+  .modal-content {
+    background-color: rgb(255, 255, 255);
+    padding: 20px;
+    border-radius: 8px;
+    width: 800px;
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .modal-button-save {
+    margin-right: 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .modal-button-cancel {
+    margin-right: 10px;
+    padding: 10px 20px;
+    background-color: #d93e58;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .modal-button-cancel:hover {
+    background-color: #cb304a;
+  }
+  
+  .modal-button:hover {
+    background-color: #0056b3;
+  }
+
+
+  h2.modal-title {
+    color: rgb(49, 49, 49);
+    margin-bottom: 20px;
+  }
+
+  .profile-photo {
+    border-radius: 50%; 
+    overflow: hidden; 
+    width: 30vh; 
+    height: 30vh; 
+    margin: 0 auto
+  }
+
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
