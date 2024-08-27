@@ -3,6 +3,7 @@ import { Table, Button, Container, Row, Col } from 'react-bootstrap';
 
 const TablaCanciones = ({ songs }) => {
   const [currentSong, setCurrentSong] = useState(null);
+  const [favorites, setFavorites] = useState({});
 
   const handlePlayPause = (index) => {
     if (currentSong === index) {
@@ -12,6 +13,13 @@ const TablaCanciones = ({ songs }) => {
     }
   };
 
+  const toggleFavorite = (songId) => {
+    setFavorites((prevFavorites) => ({
+      ...prevFavorites,
+      [songId]: !prevFavorites[songId],
+    }));
+  };
+
   return (
     <Container>
       <Table hover borderless>
@@ -19,7 +27,6 @@ const TablaCanciones = ({ songs }) => {
           <tr>
             <th>TITULO</th>
             <th>ARTISTA</th>
-            <th>GENERO</th>
             <th>DURACION</th>
           </tr>
         </thead>
@@ -45,14 +52,19 @@ const TablaCanciones = ({ songs }) => {
                       <i className={`bi ${currentSong === index ? 'bi-pause-circle' : 'bi-play-circle'}`}></i>
                     </Button>
                   </Col>
-                  <Col>{song.title}</Col>
+                  <Col>{song.nombre}</Col>
                 </Row>
               </td>
-              <td className="p-3">{song.artist}</td>
-              <td className="p-3">{song.genre}</td>
-              <td className="p-3 text-end">{song.duration}</td>
+              <td className="p-3">{song.artista}</td>
+              <td className="p-3">{song.duracion}</td>
               <td className="p-3 text-end">
-                <i className="bi bi-soundwave text-dark"></i>
+                <Button
+                  variant="link"
+                  onClick={() => toggleFavorite(song.idsong)}
+                  className="text-danger"
+                >
+                  <i className={`bi ${favorites[song.idsong] ? 'bi-heart-fill' : 'bi-heart'}`}></i>
+                </Button>
               </td>
             </tr>
           ))}
