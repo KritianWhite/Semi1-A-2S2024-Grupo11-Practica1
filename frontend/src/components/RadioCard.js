@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container, Button, Image } from 'react-bootstrap';
 
 const RadioCard = ({ songs }) => {
-  const [currentSong, setCurrentSong] = useState(null);
+  // Seleccionar una canción aleatoria al iniciar
+  const initialSong = songs && songs.length > 0 ? songs[Math.floor(Math.random() * songs.length)] : null;
+  const [currentSong, setCurrentSong] = useState(initialSong);
 
   const playRandomSong = () => {
     if (songs && songs.length > 0) {
@@ -12,10 +14,6 @@ const RadioCard = ({ songs }) => {
       setCurrentSong(null);
     }
   };
-
-  useEffect(() => {
-    playRandomSong(); // Reproduce una canción aleatoria al cargar el componente
-  }, [songs]);
 
   const handlePlayPause = () => {
     const audio = document.getElementById('audio-player');
