@@ -64,7 +64,8 @@
     overflow: hidden; 
     width: 30vh; 
     height: 30vh; 
-    margin: 0 auto
+    margin: 0 auto;
+    cursor: pointer;
   }
 
   .form-container {

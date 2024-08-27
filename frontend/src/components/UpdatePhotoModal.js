@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import './styles/UpdatePhotoModal.css';
-import Swal from 'sweetalert2';
+import Alertas from './Alertas';
 
 const UpdatePhotoModal = ({ isOpen, onClose, onSave, dataUsuario, idUsuario }) => {
   const [errors, setErrors] = useState({}); //errors del formulario
   const [selectedImage, setSelectedImage] = useState(null);
   const [base64Image, setBase64Image] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleCancel = (e) =>{
+  const handleCancel = (e) => {
     setSelectedImage(null);
     setBase64Image('');
     onClose();
+  }
+
+  const handleChangePassword = (e) => {
+    setPassword(e.target.value);
   }
 
   const handleImageChange = (e) => {
@@ -42,6 +47,53 @@ const UpdatePhotoModal = ({ isOpen, onClose, onSave, dataUsuario, idUsuario }) =
   const handleSubmit = async (e) => {
     // Evitar que el formulario recargue la página
     e.preventDefault();
+
+    // Validar que el formulario esté completo
+    if (!password) {
+      setErrors({ formPassword: 'Este campo es requerido' });
+      return;
+    }
+
+    // Validar que la imagen no esté vacía
+    if (!base64Image) {
+      setErrors({ formProfilePicture: 'Este campo es requerido' });
+      return;
+    }
+
+    // Enviar la información al servidor
+    const data = {
+      id: idUsuario,
+      imagen: base64Image,
+      password: password,
+      email: dataUsuario.email
+    };
+
+    fetch('http://localhost:4000/user/updatephoto', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status !== 200) {
+          Alertas.showToast(data.message, 'error');
+          setPassword('');
+        } else {
+          Alertas.showToast(data.message, 'success');
+          setPassword('');
+          setBase64Image('');
+          setSelectedImage(null);
+          onSave();
+          onClose();
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        Alertas.showToast(error.message, 'error');
+        setPassword('');
+      });
   };
 
   if (!isOpen) {
@@ -57,6 +109,7 @@ const UpdatePhotoModal = ({ isOpen, onClose, onSave, dataUsuario, idUsuario }) =
           <div>
             <img src={selectedImage} alt="Selected" className='profile-photo' />
           </div>
+
         ) : (
           <div>
             <img src={dataUsuario.url_imagen} alt="Selected" className='profile-photo' />
@@ -77,7 +130,17 @@ const UpdatePhotoModal = ({ isOpen, onClose, onSave, dataUsuario, idUsuario }) =
                 {errors.formProfilePicture}
               </Form.Control.Feedback>
             </Form.Group>
-
+            <Form.Group className="mb-3" controlId="formPassword">
+              <Form.Label>Ingrese su contraseña:</Form.Label>
+              <Form.Control
+                type="password"
+                name="password"
+                value={password}
+                onChange={handleChangePassword} />
+              <Form.Control.Feedback type="invalid">
+                {errors.formPassword}
+              </Form.Control.Feedback>
+            </Form.Group>
             <Button variant="primary" type="submit" className="w-100 m-1">
               Actualizar
             </Button>
