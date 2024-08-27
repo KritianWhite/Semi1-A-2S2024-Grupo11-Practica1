@@ -47,8 +47,7 @@ const login = async (req, res) => {
 
 const registro = async (req, res) => {
   try {
-    const { nombre, apellido, imagen, email, password, nacimiento } =
-      req.body;
+    const { nombre, apellido, imagen, email, password, nacimiento } = req.body;
 
     if (
       nombre === undefined ||
@@ -64,21 +63,23 @@ const registro = async (req, res) => {
       });
     }
 
-
     const check = await consult(
       `select exists (select *from usuario where email= '${email}') as userExists;`
     );
 
-    if (check[0].status == 200 && check[0].result[0].userExists == 0) { //si no existe el usuario
+    if (check[0].status == 200 && check[0].result[0].userExists == 0) {
+      //si no existe el usuario
       //subir imagen a S3
-      const base64Data = imagen.replace(/^data:image\/\w+;base64,/, '');
-      const buff = Buffer.from(base64Data, 'base64');
+      const base64Data = imagen.replace(/^data:image\/\w+;base64,/, "");
+      const buff = Buffer.from(base64Data, "base64");
       const path = `Fotos/${email}.jpg`;
 
       const response = await uploadImageS3(buff, path);
 
       if (response == null) {
-        return res.status(500).json({ status: 500, message: "Error al subir imagen en S3" });
+        return res
+          .status(500)
+          .json({ status: 500, message: "Error al subir imagen en S3" });
       }
 
       const url_imagen = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
@@ -92,7 +93,9 @@ const registro = async (req, res) => {
       const result = await consult(xsql);
 
       if (result[0].status == 200) {
-        return res.status(200).json({status:200, message: "Usuario registrado" });
+        return res
+          .status(200)
+          .json({ status: 200, message: "Usuario registrado" });
       } else {
         return res
           .status(500)
@@ -147,12 +150,11 @@ const getuser = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { id, nombre, apellido, url_imagen, email, password } = req.body;
+    const { id, nombre, apellido, email, password } = req.body;
     if (
       id === undefined ||
       nombre === undefined ||
-      apellido === undefined ||
-      url_imagen === undefined ||
+      apellido === undefined ||      
       email === undefined ||
       password === undefined
     ) {
@@ -171,7 +173,7 @@ const update = async (req, res) => {
         result[0].result[0].password
       );
       if (checkPass) {
-        xsql = `update usuario set nombre = '${nombre}', apellido = '${apellido}', url_imagen = '${url_imagen}', email = '${email}' where id = ${id};`;
+        xsql = `update usuario set nombre = '${nombre}', apellido = '${apellido}', email = '${email}' where id = ${id};`;
 
         const result = await consult(xsql);
         if (result[0].status == 200) {
@@ -185,6 +187,55 @@ const update = async (req, res) => {
         return res
           .status(500)
           .json({ status: 500, message: "Password Incorrecto" });
+      }
+    } else {
+      return res
+        .status(500)
+        .json({ status: 500, message: "error usuario no existe" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: 500, message: error.message });
+  }
+};
+
+const updatephoto = async (req, res) => {
+  try {
+    const { id, email, imagen } = req.body;
+    if (id === undefined || email === undefined || imagen === undefined) {
+      return res.status(404).json({
+        status: 404,
+        message: "Solicitud incorrecta. Por favor, rellene todos los campos.",
+      });
+    }
+
+    let xsql = `select *from usuario where id = '${id}'`;
+    const result = await consult(xsql);
+
+    if (result[0].status == 200 && result[0].result.length > 0) {      
+      const base64Data = imagen.replace(/^data:image\/\w+;base64,/, "");
+      const buff = Buffer.from(base64Data, "base64");
+      const path = `Fotos/${email}.jpg`;
+
+      const response = await uploadImageS3(buff, path);
+
+      if (response == null) {
+        return res
+          .status(500)
+          .json({ status: 500, message: "Error al subir imagen en S3" });
+      }
+
+      const url_imagen = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
+
+      xsql = `update usuario set url_imagen = '${url_imagen}' where id = ${id};`;
+
+      const result = await consult(xsql);
+      if (result[0].status == 200) {
+        return res.status(200).json({ message: "Imagen actualizada" });
+      } else {
+        return res
+          .status(500)
+          .json({ status: 500, message: result[0].message });
       }
     } else {
       return res
@@ -221,11 +272,12 @@ const uploadImageS3 = async (buff, path) => {
     console.error(error);
     return null;
   }
-}
+};
 
 export const user = {
   login,
   registro,
   getuser,
   update,
+  updatephoto,
 };
