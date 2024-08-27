@@ -13,9 +13,9 @@ const DashboardAdmin = () => {
     const location = useLocation();
 
     // Si el usuario no tiene acceso a la ruta actual, redirige a una página de error o a la página principal
-    // if (!hasAccessToRoute(location.pathname)) {
-    //     return <Navigate to="/404" />;
-    // }
+    if (!hasAccessToRoute(location.pathname)) {
+        return <Navigate to="/404" />;
+    }
 
     const initialSongs = [
         {
