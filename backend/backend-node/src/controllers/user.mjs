@@ -80,7 +80,7 @@ const registro = async (req, res) => {
 
       const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
 
-      const path = `Fotos/${email+fechaHoraNumerica}.jpg`;
+      const path = `Fotos/${email + fechaHoraNumerica}.jpg`;
 
       const response = await uploadImageS3(buff, path);
 
@@ -244,7 +244,7 @@ const updatephoto = async (req, res) => {
 
       const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
 
-      const path = `Fotos/${email+fechaHoraNumerica}.jpg`;
+      const path = `Fotos/${email + fechaHoraNumerica}.jpg`;
 
       const response = await uploadImageS3(buff, path);
 
@@ -259,7 +259,7 @@ const updatephoto = async (req, res) => {
       xsql = `update usuario set url_imagen = '${url_imagen}' where id = ${id};`;
       const result2 = await consult(xsql);
       if (result2[0].status == 200) {
-        return res.status(200).json({status:200, message: "Foto de perfil actualizada" });
+        return res.status(200).json({ status: 200, message: "Foto de perfil actualizada" });
       } else {
         return res
           .status(500)
