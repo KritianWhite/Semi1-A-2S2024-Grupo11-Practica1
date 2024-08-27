@@ -150,12 +150,11 @@ const getuser = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { id, nombre, apellido, url_imagen, email, password } = req.body;
+    const { id, nombre, apellido, email, password } = req.body;
     if (
       id === undefined ||
       nombre === undefined ||
-      apellido === undefined ||
-      url_imagen === undefined ||
+      apellido === undefined ||      
       email === undefined ||
       password === undefined
     ) {
@@ -174,7 +173,7 @@ const update = async (req, res) => {
         result[0].result[0].password
       );
       if (checkPass) {
-        xsql = `update usuario set nombre = '${nombre}', apellido = '${apellido}', url_imagen = '${url_imagen}', email = '${email}' where id = ${id};`;
+        xsql = `update usuario set nombre = '${nombre}', apellido = '${apellido}', email = '${email}' where id = ${id};`;
 
         const result = await consult(xsql);
         if (result[0].status == 200) {
