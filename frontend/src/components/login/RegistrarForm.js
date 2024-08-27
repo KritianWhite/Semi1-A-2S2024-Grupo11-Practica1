@@ -78,7 +78,7 @@ function RegisterForm() {
         })
         .catch((error) => {
           console.error('Error:', error);
-          Alertas.showToast(error, 'error');
+          Alertas.showToast(error.message, 'error');
         });
     }
   };
