@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
+import Bienvenida from "./pages/Bienvenida";
 import LoginPage from "./pages/login/LoginPages";
 import RegistrarPage from "./pages/login/RegistrarPage";
 import HomeAdmin from "./pages/HomePage";
@@ -20,6 +21,7 @@ function App() {
       <Router>
         <TrackLocation />
         <Routes>
+          <Route path="/" element={<Bienvenida />} />
           <Route path="/Login" element={<LoginPage />} />
           <Route path="/Registrarse" element={<RegistrarPage />} />
           <Route path="/Inicio" element={<HomeAdmin />} />

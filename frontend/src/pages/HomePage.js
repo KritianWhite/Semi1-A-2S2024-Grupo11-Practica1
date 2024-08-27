@@ -17,10 +17,10 @@ const AdminPage = () => {
     return <Navigate to="/404" />;
   }
   const songs = [
-    { title: 'Dance of the Mommoths', artist: 'The Whole Other', genre: 'Cinematic', duration: '1:50' },
-    { title: 'Luxery', artist: 'Caustic', genre: 'Hip-Hop & Rap', duration: '3:03' },
-    { title: 'Regrets', artist: 'Caustic', genre: 'Hip-Hop & Rap', duration: '3:17' },
-    { title: 'Project', artist: 'Patrick Patrikios', genre: 'Dance & Electronic', duration: '3:30' },
+    { idsong: 1, nombre: 'Dance of the Mommoths', artista: 'The Whole Other', duracion: '1:50' },
+    { idsong: 2, nombre: 'Luxery', artista: 'Caustic', duracion: '3:03' },
+    { idsong: 3, nombre: 'Regrets', artista: 'Caustic', duracion: '3:17' },
+    { idsong: 4, nombre: 'Project', artista: 'Patrick Patrikios', duracion: '3:30' },
   ];
 
   return (
