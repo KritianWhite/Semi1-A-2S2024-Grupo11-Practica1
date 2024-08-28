@@ -6,10 +6,10 @@ const SongForm = ({ initialData, onSubmit, onCancel }) => {
     const [formData, setFormData] = useState({
         id: 0,
         nombre: '',
-        imagen: '',
+        url_caratula: '',
         duracion: '',
         artista: '',
-        mp3: '',
+        url_mp3: '',
     });
 
     useEffect(() => {
@@ -38,12 +38,13 @@ const SongForm = ({ initialData, onSubmit, onCancel }) => {
 
     const handleSubmit = (typeForm) => { //typeForm 1=crear, 2=actualizar
         // validar que los campos no estén vacíos
+        
         if (
             !formData.nombre ||
             !formData.artista ||
             !formData.duracion ||
-            !formData.imagen ||
-            !formData.mp3
+            !formData.url_caratula ||
+            !formData.url_mp3
         ) {
             Alertas.showAlert('Todos los campos son obligatorios', 'error');
         } else {
@@ -58,8 +59,8 @@ const SongForm = ({ initialData, onSubmit, onCancel }) => {
                         nombre: formData.nombre,
                         artista: formData.artista,
                         duracion: formData.duracion,
-                        imagen: formData.imagen,
-                        mp3: formData.mp3
+                        imagen: formData.url_caratula,
+                        mp3: formData.url_mp3
                     }),
                 })
                     .then((res) => res.json())
@@ -179,11 +180,11 @@ const SongForm = ({ initialData, onSubmit, onCancel }) => {
                     Cancelar
                 </Button>
                 {initialData ? (
-                    <Button variant="primary" onClick={e => handleSubmit(2)}>
+                    <Button variant="primary" onClick={() => handleSubmit(2)}>
                         Actualizar
                     </Button>
                 ) : (
-                    <Button variant="primary" onClick={e => handleSubmit(1)}>
+                    <Button variant="primary" onClick={() => handleSubmit(1)}>
                         Crear
                     </Button>
                 )}

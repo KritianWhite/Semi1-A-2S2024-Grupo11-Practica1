@@ -1,16 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Modal } from 'react-bootstrap';
 import SongList from './SongList';
 import SongForm from './SongForm';
 import SongDetails from './SongDetails';
 import UpdateFileForm from './UpdateFileForm';
+import Alertas from '../Alertas';
 
-const AdminView = ({ initialSongs }) => {
-    const [songs, setSongs] = useState(initialSongs);
+const AdminView = () => {
+    const [songs, setSongs] = useState([]);
     const [currentSong, setCurrentSong] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [showUpdatePhotoForm, setShowUpdatePhotoForm] = useState(false);
     const [showUpdateMp3Form, setShowUpdateMp3Form] = useState(false);
+
+    useEffect(() => {
+        const fetchSongs = async () => {
+            try {
+                const response = await fetch('http://localhost:4000/song/list', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Error al obtener las canciones');
+                }
+                const data = await response.json();
+                setSongs(data);
+            } catch (error) {
+                console.error('Error:', error);
+                Alertas.showToast(error.message, 'error');
+            }
+        };
+
+        fetchSongs();
+    }, []);
 
     const handleCreateOrUpdate = (newSong) => {
         if (currentSong) {
@@ -30,7 +54,7 @@ const AdminView = ({ initialSongs }) => {
         setSongs(
             songs.map((song) =>
                 song.nombre === currentSong.nombre
-                    ? { ...song, imagen: updatedPhoto }
+                    ? { ...song, url_caratula: updatedPhoto }
                     : song
             )
         );
@@ -41,7 +65,7 @@ const AdminView = ({ initialSongs }) => {
         setSongs(
             songs.map((song) =>
                 song.nombre === currentSong.nombre
-                    ? { ...song, mp3: updatedMp3 }
+                    ? { ...song, url_mp3: updatedMp3 }
                     : song
             )
         );
@@ -84,6 +108,9 @@ const AdminView = ({ initialSongs }) => {
                     <Button variant="primary" onClick={handleShowCreateForm}>
                         Crear Nueva Canción
                     </Button>
+                    <br />
+                    <br />
+                    <br />
                     <SongList
                         songs={songs}
                         onEdit={handleEdit}
