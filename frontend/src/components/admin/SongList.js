@@ -72,7 +72,7 @@ const SongList = ({ songs = [], onEdit, onDelete, onShowDetail, onUpdatePhoto, o
                 <Button variant="warning" onClick={() => onEdit(song)} className="me-2" title="Actualizar Canción">
                   <i className="bi bi-pencil-square"></i>
                 </Button>
-                <Button variant="danger" onClick={() => onDelete(song.nombre)} className="me-2" title="Eliminar Canción">
+                <Button variant="danger" onClick={() => onDelete(song.id)} className="me-2" title="Eliminar Canción">
                   <i className="bi bi-trash"></i>
                 </Button>
                 <Button variant="secondary" onClick={() => onUpdatePhoto(song)} className="me-2" title="Actualizar Foto">

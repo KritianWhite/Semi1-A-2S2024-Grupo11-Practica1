@@ -278,11 +278,11 @@ const remove = async (req, res) => {
     result = await consult(`delete from cancion where id = '${idcancion}';`);
 
     if (result[0].status == 200 && result[0].result.affectedRows > 0) {
-      return res.status(200).json({ message: "Canción eliminada" });
+      return res.status(200).json({status:200, message: "Canción eliminada" });
     } else {
       return res
         .status(500)
-        .json({ status: 500, message: "error, cancion no se puedo eliminar" });
+        .json({ status: 500, message: "error, cancion no se pudo eliminar" });
     }
   } catch (error) {
     console.log(error);
