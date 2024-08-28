@@ -72,8 +72,9 @@ const AdminView = () => {
                     : song
             )
         );
+        let song = {...currentSong, url_mp3: updatedMp3};
         setShowUpdateMp3Form(false);
-        handleShowDetail(currentSong);
+        handleShowDetail(song);
     };
 
     const handleEdit = (song) => {
@@ -167,6 +168,7 @@ const AdminView = () => {
                         onSubmit={handleUpdateMp3}
                         onCancel={() => setShowUpdateMp3Form(false)}
                         accept="audio/*"
+                        idSong = {currentSong? currentSong.id : null}
                     />
                 </Modal.Body>
             </Modal>

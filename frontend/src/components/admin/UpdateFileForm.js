@@ -32,11 +32,14 @@ const UpdateFileForm = ({ fileType, onSubmit, onCancel, accept, idSong }) => {
             return;
         }
 
-        let api_uri = 'http://localhost:4000/song/';   
+        let api_uri = 'http://localhost:4000/song/';  
+        let data = {};
         if (fileType === 'imagen') {
             api_uri += 'updateimage';
+            data = { idcancion: idSong, imagen: fileData };
         } else {
             api_uri += 'updatemp3';
+            data = { idcancion: idSong, mp3: fileData };
         }
         //actualizar foto en el servidor
         fetch(api_uri, {
@@ -44,7 +47,7 @@ const UpdateFileForm = ({ fileType, onSubmit, onCancel, accept, idSong }) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ idcancion: idSong, imagen: fileData }),
+            body: JSON.stringify(data),
         })
             .then((response) => {
                 if (!response.ok) {
