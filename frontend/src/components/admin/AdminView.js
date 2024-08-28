@@ -54,10 +54,13 @@ const AdminView = () => {
         setSongs(
             songs.map((song) =>
                 song.nombre === currentSong.nombre
-                    ? { ...song, url_caratula: updatedPhoto }
+                    ? { ...song, url_caratula: updatedPhoto}
                     : song
             )
         );
+        //actualizamos la caratura de la cancion actual
+        let song = {...currentSong, url_caratula: updatedPhoto};
+        handleShowDetail(song);
         setShowUpdatePhotoForm(false);
     };
 
@@ -70,6 +73,7 @@ const AdminView = () => {
             )
         );
         setShowUpdateMp3Form(false);
+        handleShowDetail(currentSong);
     };
 
     const handleEdit = (song) => {
@@ -148,6 +152,7 @@ const AdminView = () => {
                         onSubmit={handleUpdatePhoto}
                         onCancel={() => setShowUpdatePhotoForm(false)}
                         accept="image/*"
+                        idSong = {currentSong? currentSong.id : null}
                     />
                 </Modal.Body>
             </Modal>

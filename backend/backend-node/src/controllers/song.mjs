@@ -146,6 +146,62 @@ const modify = async (req, res) => {
   }
 };
 
+const updateImage = async (req, res) => {
+  try {
+    const {idcancion, imagen} = req.body;
+    if (idcancion === undefined || imagen === undefined) {
+      return res.status(404).json({
+        status: 404,
+        message: "Solicitud incorrecta. Por favor, rellene todos los campos.",
+      });
+    }
+
+    let result = await consult(`select *from cancion where id = '${idcancion}';`);
+
+    if (result[0].status == 200 && result[0].result.length > 0) {
+      //guardar la caratula de la cancion en S3
+      const base64Data = imagen.replace(/^data:image\/\w+;base64,/, "");
+      const buff = Buffer.from(base64Data, "base64");
+      const fechaHoraActual = new Date();
+      const ano = fechaHoraActual.getFullYear().toString();
+      const mes = (fechaHoraActual.getMonth() + 1).toString().padStart(2, '0'); // Se agrega +1 porque los meses se indexan desde 0
+      const dia = fechaHoraActual.getDate().toString().padStart(2, '0');
+      const hora = fechaHoraActual.getHours().toString().padStart(2, '0');
+      const minutos = fechaHoraActual.getMinutes().toString().padStart(2, '0');
+      const segundos = fechaHoraActual.getSeconds().toString().padStart(2, '0');
+
+      const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
+
+      //eliminar los espacios en blanco y los puntos
+      const nombreSinEspacios = result[0].result[0].nombre.replace(/\s/g, '').replace(/\./g, '');
+
+      const path = `Fotos/${nombreSinEspacios + fechaHoraNumerica}.jpg`;
+
+      const response = await uploadImageS3(buff, path);
+
+      if (response == null) {
+        return res
+          .status(500)
+          .json({ status: 500, message: "Error al subir imagen en S3" });
+      }
+
+      const url_caratula = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
+
+      result = await consult(`update cancion set url_caratula = '${url_caratula}' where id = ${idcancion};`);
+      if (result[0].status == 200) {
+        return res.status(200).json({status: 200, message: "Imagen de canción actualizada", url: url_caratula });
+      } else {
+        return res
+          .status(500)
+          .json({ status: 500, message: result[0].message });
+      }
+    }
+  } catch (error) {
+    console.loh(error);
+    return res.status(500).json({ status: 500, message: error.message });
+  }
+}
+
 const remove = async (req, res) => {
   try {
     const { idcancion } = req.body;
@@ -182,5 +238,6 @@ export const song = {
   create,
   list,
   modify,
+  updateImage,
   remove,
 };
