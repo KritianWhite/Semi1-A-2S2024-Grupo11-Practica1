@@ -82,8 +82,28 @@ const AdminView = () => {
         setShowForm(true);
     };
 
-    const handleDelete = (songName) => {
-        setSongs(songs.filter((song) => song.nombre !== songName));
+    const handleDelete = (songId) => {
+        // Eliminar la canción del servidor
+        fetch('http://localhost:4000/song/remove', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ idcancion: songId }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.status === 200) {
+                    Alertas.showToast(data.message, 'success');
+                    setSongs(songs.filter((song) => song.id !== songId));
+                } else {
+                    Alertas.showToast(data.message, 'error');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                Alertas.showToast(error.message, 'error');
+            });
     };
 
     const handleShowDetail = (song) => {
