@@ -1,4 +1,6 @@
 import { consult } from "../database/database.mjs";
+import { uploadImageS3, uploadMP3S3 } from "../s3.mjs";
+import config from "../config.mjs";
 
 const create = async (req, res) => {
   try {
@@ -21,13 +23,61 @@ const create = async (req, res) => {
     and artista = '${artista}') as songExists;`);  
 
     if (check[0].status == 200 && check[0].result[0].songExists == 0) {
+
+      //guardar la caratula de la cancion en S3
+      const base64Data = imagen.replace(/^data:image\/\w+;base64,/, "");
+      const buff = Buffer.from(base64Data, "base64");
+      const fechaHoraActual = new Date();
+      const ano = fechaHoraActual.getFullYear().toString();
+      const mes = (fechaHoraActual.getMonth() + 1).toString().padStart(2, '0'); // Se agrega +1 porque los meses se indexan desde 0
+      const dia = fechaHoraActual.getDate().toString().padStart(2, '0');
+      const hora = fechaHoraActual.getHours().toString().padStart(2, '0');
+      const minutos = fechaHoraActual.getMinutes().toString().padStart(2, '0');
+      const segundos = fechaHoraActual.getSeconds().toString().padStart(2, '0');
+
+      const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
+
+      //eliminar los espacios en blanco y los puntos
+      const nombreSinEspacios = nombre.replace(/\s/g, '').replace(/\./g, '');
+
+      const path = `Fotos/${nombreSinEspacios + fechaHoraNumerica}.jpg`;
+
+      const response = await uploadImageS3(buff, path);
+
+      if (response == null) {
+        return res
+          .status(500)
+          .json({ status: 500, message: "Error al subir imagen en S3" });
+      }
+
+      //subir el mp3 a S3
+      const base64DataMp3 = mp3.replace(/^data:audio\/\w+;base64,/, "");
+      const buffMp3 = Buffer.from(base64DataMp3, "base64");
+      const pathMp3 = `Canciones/${nombreSinEspacios + fechaHoraNumerica}.mp3`;
+
+      const responseMp3 = await uploadMP3S3(buffMp3, pathMp3);
+
+      if (responseMp3 == null) {
+        return res
+          .status(500)
+          .json({ status: 500, message: "Error al subir mp3 en S3" });
+      }
+
+      const url_caratula = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
+      const url_mp3 = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${pathMp3}`;
+
       const xsql = `insert into cancion (nombre, url_caratula, duracion, artista, url_mp3) 
-            values ('${nombre}', '${imagen}', '${duracion}', '${artista}', '${mp3}');`;
+            values ('${nombre}', '${url_caratula}', '${duracion}', '${artista}', '${url_mp3}');`;
 
       const result = await consult(xsql);
 
       if (result[0].status == 200) {
-        return res.status(200).json({ message: "Canción creada" });
+        //obtener el id de la cancion
+        const id_cancion = await consult(`select id from cancion where nombre = '${nombre}' and duracion = '${duracion}' and artista = '${artista}';`);
+        if (id_cancion[0].status == 200) {
+          return res.status(200).json({status: 200, message: "Canción creada", id_cancion: id_cancion[0].result[0].id });
+        }
+        return res.status(500).json({ status: 500, message: "Error al obtener el id de la canción creada" });
       } else {
         return res
           .status(500)
@@ -60,11 +110,10 @@ const list = async (req, res) => {
 
 const modify = async (req, res) => {
   try {
-    const { idcancion, nombre, url_imagen, duracion, artista } = req.body;
+    const { idcancion, nombre, duracion, artista } = req.body;
     if (
       idcancion === undefined ||
       nombre === undefined ||
-      url_imagen === undefined ||
       duracion === undefined ||
       artista === undefined
     ) {
@@ -78,9 +127,9 @@ const modify = async (req, res) => {
 
     if (result[0].status == 200 && result[0].result.length > 0) {
       
-      result = await consult(`update cancion set nombre = '${nombre}', url_caratula = '${url_imagen}', duracion= '${duracion}', artista = '${artista}' where id = ${idcancion};`);
+      result = await consult(`update cancion set nombre = '${nombre}', duracion= '${duracion}', artista = '${artista}' where id = ${idcancion};`);
       if (result[0].status == 200) {
-        return res.status(200).json({ message: "Canción actualizado" });
+        return res.status(200).json({status: 200, message: "Canción actualizada" });
       } else {
         return res
           .status(500)

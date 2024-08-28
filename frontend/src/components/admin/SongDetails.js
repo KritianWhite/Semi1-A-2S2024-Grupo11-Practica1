@@ -18,11 +18,11 @@ const SongDetails = ({ song }) => {
                 <strong>Duración:</strong> {song.duracion}
             </p>
             <img
-                src={song.imagen}
+                src={song.url_caratula}
                 alt={song.nombre}
                 style={{ width: '100%', borderRadius: '10px' }}
             />
-            <audio controls className="mt-3" src={song.mp3}></audio>
+            <audio controls className="mt-3" src={song.url_mp3}></audio>
         </div>
     );
 };
