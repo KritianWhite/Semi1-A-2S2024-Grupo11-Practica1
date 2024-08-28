@@ -72,7 +72,12 @@ const create = async (req, res) => {
       const result = await consult(xsql);
 
       if (result[0].status == 200) {
-        return res.status(200).json({status: 200, message: "Canción creada" });
+        //obtener el id de la cancion
+        const id_cancion = await consult(`select id from cancion where nombre = '${nombre}' and duracion = '${duracion}' and artista = '${artista}';`);
+        if (id_cancion[0].status == 200) {
+          return res.status(200).json({status: 200, message: "Canción creada", id_cancion: id_cancion[0].result[0].id });
+        }
+        return res.status(500).json({ status: 500, message: "Error al obtener el id de la canción creada" });
       } else {
         return res
           .status(500)
@@ -105,11 +110,10 @@ const list = async (req, res) => {
 
 const modify = async (req, res) => {
   try {
-    const { idcancion, nombre, url_imagen, duracion, artista } = req.body;
+    const { idcancion, nombre, duracion, artista } = req.body;
     if (
       idcancion === undefined ||
       nombre === undefined ||
-      url_imagen === undefined ||
       duracion === undefined ||
       artista === undefined
     ) {
@@ -123,9 +127,9 @@ const modify = async (req, res) => {
 
     if (result[0].status == 200 && result[0].result.length > 0) {
       
-      result = await consult(`update cancion set nombre = '${nombre}', url_caratula = '${url_imagen}', duracion= '${duracion}', artista = '${artista}' where id = ${idcancion};`);
+      result = await consult(`update cancion set nombre = '${nombre}', duracion= '${duracion}', artista = '${artista}' where id = ${idcancion};`);
       if (result[0].status == 200) {
-        return res.status(200).json({ message: "Canción actualizado" });
+        return res.status(200).json({status: 200, message: "Canción actualizada" });
       } else {
         return res
           .status(500)

@@ -19,11 +19,12 @@ const DashboardAdmin = () => {
 
     const initialSongs = [
         {
-            "nombre": "Bohemian Rhapsody",
-            "imagen": "data:image/jpeg;base64,...",  // Reemplaza con una imagen en base64
-            "duracion": "00:05:55",
-            "artista": "Queen",
-            "mp3": "data:audio/mp3;base64,..."  // Reemplaza con un archivo de audio en base64
+            "id" : 1,
+            "nombre": "sneaky ways latin",
+            "imagen": "https://multimedia-semi1-seccion-a-g11.s3.us-east-1.amazonaws.com/Fotos/sneakywayslatin20240827230710.jpg",  // Reemplaza con una imagen en base64
+            "duracion": "00:02:50",
+            "artista": "desconocido",
+            "mp3": "https://multimedia-semi1-seccion-a-g11.s3.us-east-1.amazonaws.com/Canciones/sneakywayslatin20240827230710.mp3"  // Reemplaza con un archivo de audio en base64
         },
         {
             "nombre": "Stairway to Heaven",
