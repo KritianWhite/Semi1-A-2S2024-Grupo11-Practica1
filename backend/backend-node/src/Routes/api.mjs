@@ -18,6 +18,7 @@ router.post("/song/create", song.create);
 router.get("/song/list", song.list);
 router.post("/song/modify", song.modify);
 router.post("/song/updateimage", song.updateImage);
+router.post("/song/updatemp3", song.updateMp3);
 router.post("/song/remove", song.remove);
 
 /*****Playlists****/
