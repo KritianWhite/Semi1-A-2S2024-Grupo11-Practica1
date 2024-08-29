@@ -249,7 +249,7 @@ const addsong = async (req, res) => {
         if (result[0].status == 200) {
           return res
             .status(200)
-            .json({ message: "Canción añadida a playlist" });
+            .json({status:200, message: "Canción añadida a playlist" });
         } else {
           return res
             .status(500)
@@ -282,7 +282,7 @@ const removesong = async (req, res) => {
     );
 
     if (result[0].status == 200 && result[0].result.affectedRows > 0) {
-      return res.status(200).json({ message: "Canción eliminada de playlist" });
+      return res.status(200).json({status:200, message: "Canción eliminada de playlist" });
     } else {
       return res
         .status(500)
@@ -306,7 +306,7 @@ const getsongs = async (req, res) => {
       });
     }
 
-    let xsql = `select ca.id as idsong, ca.nombre, ca.url_caratula as url_imagen, ca.duracion, ca.artista, ca.url_mp3
+    let xsql = `select ca.id, ca.nombre, ca.url_caratula as url_imagen, ca.duracion, ca.artista, ca.url_mp3
      from cancionplaylist as caply
      INNER JOIN cancion as ca on ca.id = caply.id_cancion
      where caply.id_playlist = '${idplaylist}';`;
@@ -314,7 +314,7 @@ const getsongs = async (req, res) => {
     if (result[0].status == 200 && result[0].result.length > 0) {
       return res.status(200).json(result[0].result);
     } else {
-      return res.status(500).json({ status: 500, message: "no se pudo obtener las canciones de la playlist" });
+      return res.status(200).json([]);
     }
   } catch (error) {
     return res.status(500).json({ status: 500, message: error.message });
