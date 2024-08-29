@@ -16,8 +16,7 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
     setSelectedPlaylist(playlistId);
     setShowSongs(true);
     // Enviar el idplaylist y actualizar las canciones
-    const fetchedSongs = await fetchSongs({ idplaylist: playlistId });
-    //setSongs(fetchedSongs);
+    fetchSongs({ idplaylist: playlistId });
   };
 
   useEffect(() => {
@@ -130,13 +129,18 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
       });
   }
 
+  const handleRemoveSong = () => {
+    //volver a cargar las canciones
+    fetchSongs({ idplaylist: selectedPlaylist });
+  }
+
 
   return (
     <Container>
       {selectedPlaylist && showSongs ? (
         <>
           <Button variant="link" onClick={() => handleVolver()}>Volver</Button>
-          <TablaCanciones songs={songs} />
+          <TablaCanciones songs={songs} screen={'playlist'} playlistId={selectedPlaylist} removeSongFromPlayList={handleRemoveSong}/>
         </>
       ) : (
         <>

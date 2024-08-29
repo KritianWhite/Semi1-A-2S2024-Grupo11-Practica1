@@ -94,9 +94,10 @@ const Favoritos = () => {
                     {/* Aquí va contenido principal */}
                     <h1>TUS FAVORITOS</h1>
                     <div className="d-flex justify-content-center align-items-center">
-                        <TablaCanciones songs={songs} onToggleFavorite={handleToggleFavorite} userId={userid} />
+                        <TablaCanciones songs={songs} onToggleFavorite={handleToggleFavorite} userId={userid} screen={'favorites'} />
                     </div>
                 </Col>
+                            
             </Container>
         </>
     );
