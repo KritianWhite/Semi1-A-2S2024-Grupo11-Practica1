@@ -87,7 +87,7 @@ const HomePage = () => {
           <h1 className="mb-4">Bienvenido a SOUNDSTREAM</h1>
           <h2 className="mb-4">Últimos Lanzamientos</h2>
           <div className="d-flex justify-content-center align-items-center">
-            <TablaCanciones songs={songs} onToggleFavorite={handleToggleFavorite} userId={userid} />
+            <TablaCanciones songs={songs} onToggleFavorite={handleToggleFavorite} userId={userid} screen={'home'} />
           </div>
         </Col>
       </Container>

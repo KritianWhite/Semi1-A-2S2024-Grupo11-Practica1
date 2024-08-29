@@ -306,7 +306,7 @@ const getsongs = async (req, res) => {
       });
     }
 
-    let xsql = `select ca.id, ca.nombre, ca.url_caratula as url_imagen, ca.duracion, ca.artista, ca.url_mp3
+    let xsql = `select ca.id, ca.nombre, ca.url_caratula, ca.duracion, ca.artista, ca.url_mp3
      from cancionplaylist as caply
      INNER JOIN cancion as ca on ca.id = caply.id_cancion
      where caply.id_playlist = '${idplaylist}';`;
