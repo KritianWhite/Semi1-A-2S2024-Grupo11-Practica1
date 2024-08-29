@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Table, Button, Container, Row, Col } from 'react-bootstrap';
+import Alertas from './Alertas';
 
-const TablaCanciones = ({ songs }) => {
+const TablaCanciones = ({ songs, userId, onToggleFavorite }) => {
   const [currentSong, setCurrentSong] = useState(null);
-  const [favorites, setFavorites] = useState({});
 
   const handlePlayPause = (index) => {
     if (currentSong === index) {
@@ -11,13 +11,6 @@ const TablaCanciones = ({ songs }) => {
     } else {
       setCurrentSong(index); // Reproducir una nueva canción
     }
-  };
-
-  const toggleFavorite = (songId) => {
-    setFavorites((prevFavorites) => ({
-      ...prevFavorites,
-      [songId]: !prevFavorites[songId],
-    }));
   };
 
   return (
@@ -60,10 +53,11 @@ const TablaCanciones = ({ songs }) => {
               <td className="p-3 text-end">
                 <Button
                   variant="link"
-                  onClick={() => toggleFavorite(song.idsong)}
+                  onClick={() => onToggleFavorite(song.id, song.es_favorito)}
                   className="text-danger"
+                  title={song.es_favorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}
                 >
-                  <i className={`bi ${favorites[song.idsong] ? 'bi-heart-fill' : 'bi-heart'}`}></i>
+                  <i className={`bi ${song.es_favorito ? 'bi-heart-fill' : 'bi-heart'}`} ></i>
                 </Button>
               </td>
             </tr>
