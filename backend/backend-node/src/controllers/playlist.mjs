@@ -175,10 +175,11 @@ const updatefoto = async (req, res) => {
     }
 }
 
-const deletesong = async (req, res) => {
+
+const deleteplaylist = async (req, res) => {
   try {
-    const { iduser, idplaylist } = req.body;
-    if (iduser === undefined || idplaylist === undefined) {
+    const { idplaylist } = req.body;
+    if (idplaylist === undefined) {
       return res.status(404).json({
         status: 404,
         message: "Solicitud incorrecta. Por favor, rellene todos los campos.",
@@ -186,11 +187,11 @@ const deletesong = async (req, res) => {
     }
 
     const result = await consult(
-      `update playlist set eliminada = 1 where id = '${idplaylist}' and id_user = '${iduser}';`
+      `update playlist set eliminada = 1 where id = '${idplaylist}';`
     );
 
     if (result[0].status == 200 && result[0].result.affectedRows > 0) {
-      return res.status(200).json({ message: "Playlist eliminada" });
+      return res.status(200).json({status:200, message: "Playlist eliminada" });
     } else {
       return res
         .status(500)
@@ -324,7 +325,7 @@ export const playlist = {
   create,
   getall,
   modify,
-  deletesong,
+  deleteplaylist,
   addsong,
   removesong,
   getsongs,

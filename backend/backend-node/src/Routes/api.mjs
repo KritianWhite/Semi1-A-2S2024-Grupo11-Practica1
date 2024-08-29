@@ -27,7 +27,7 @@ router.post("/playlist/create", playlist.create);
 router.post("/playlist/getall", playlist.getall);
 router.post("/playlist/modify", playlist.modify);
 router.post("/playlist/updatefoto", playlist.updatefoto);
-router.post("/playlist/delete", playlist.deletesong);
+router.post("/playlist/delete", playlist.deleteplaylist);
 router.post("/playlist/addsong", playlist.addsong);
 router.post("/playlist/removesong", playlist.removesong);
 router.post("/playlist/getsongs", playlist.getsongs);

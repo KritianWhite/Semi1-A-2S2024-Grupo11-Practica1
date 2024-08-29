@@ -105,6 +105,31 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
     setShowUpdatePhotoForm(false);
   }
 
+  const handleDelete = (playlist) => {
+    console.log(playlist);
+    // Eliminar playlist
+    fetch('http://localhost:4000/playlist/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idplaylist: playlist.id }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === 200) {
+          Alertas.showToast(data.message, 'success');
+          setPlaylists(playlists.filter((p) => p.id !== playlist.id));
+        } else {
+          Alertas.showToast(data.message, 'error');
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        Alertas.showToast(error.message, 'error');
+      });
+  }
+
 
   return (
     <Container>
@@ -161,7 +186,7 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
                         <Button
                           variant="button"
                           title='Eliminar'
-                          onClick={(e) => {}}
+                          onClick={(e) => {e.stopPropagation(); handleDelete(playlist);}}
                         >
                           <i className="bi bi-trash"></i>
                         </Button>
