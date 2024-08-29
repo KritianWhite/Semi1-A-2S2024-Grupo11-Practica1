@@ -290,6 +290,28 @@ const remove = async (req, res) => {
   }
 };
 
+const lastest = async (req, res) => { // retorna las ultimas canciones añadidas para mostrar en la pagina principal
+  //obtenemos el id del usuario
+  const { idusuario } = req.body;
+  if(idusuario === undefined) {
+    return res.status(404).json({
+      status: 404,
+      message: "Ocurrió un error interno"
+    });
+  }
+  try {
+    let xsql = `select c.*, IF(f.id_usuario IS NOT NULL, 1, 0) as es_favorito from cancion c left join favorito f on c.id = f.id_cancion AND f.id_usuario = '${idusuario}' order by c.id desc limit 10;`;
+    let result = await consult(xsql);
+    if (result[0].status == 200) {
+      return res.status(200).json(result[0].result);
+    } else {
+      return res.status(500).json({ status: 500, message: result[0].message });
+    }
+  } catch (error) {
+    return res.status(500).json({ status: 500, message: error.message });
+  }
+};
+
 export const song = {
   create,
   list,
@@ -297,4 +319,5 @@ export const song = {
   updateImage,
   updateMp3,
   remove,
+  lastest
 };
