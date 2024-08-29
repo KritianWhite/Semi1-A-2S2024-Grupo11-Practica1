@@ -54,12 +54,12 @@ const AdminView = () => {
         setSongs(
             songs.map((song) =>
                 song.nombre === currentSong.nombre
-                    ? { ...song, url_caratula: updatedPhoto}
+                    ? { ...song, url_caratula: updatedPhoto }
                     : song
             )
         );
         //actualizamos la caratura de la cancion actual
-        let song = {...currentSong, url_caratula: updatedPhoto};
+        let song = { ...currentSong, url_caratula: updatedPhoto };
         handleShowDetail(song);
         setShowUpdatePhotoForm(false);
     };
@@ -72,7 +72,7 @@ const AdminView = () => {
                     : song
             )
         );
-        let song = {...currentSong, url_mp3: updatedMp3};
+        let song = { ...currentSong, url_mp3: updatedMp3 };
         setShowUpdateMp3Form(false);
         handleShowDetail(song);
     };
@@ -129,6 +129,9 @@ const AdminView = () => {
         <Container>
             <h2 className="my-4">Administrador - Canciones</h2>
             <Row>
+                <Col md={4}>
+                    <SongDetails song={currentSong} />
+                </Col>
                 <Col md={8}>
                     <Button variant="primary" onClick={handleShowCreateForm}>
                         Crear Nueva Canción
@@ -145,9 +148,7 @@ const AdminView = () => {
                         onUpdateMp3={handleShowUpdateMp3Form}
                     />
                 </Col>
-                <Col md={4}>
-                    <SongDetails song={currentSong} />
-                </Col>
+
             </Row>
 
             <Modal show={showForm} onHide={() => setShowForm(false)}>
@@ -173,7 +174,7 @@ const AdminView = () => {
                         onSubmit={handleUpdatePhoto}
                         onCancel={() => setShowUpdatePhotoForm(false)}
                         accept="image/*"
-                        idSong = {currentSong? currentSong.id : null}
+                        idSong={currentSong ? currentSong.id : null}
                     />
                 </Modal.Body>
             </Modal>
@@ -188,7 +189,7 @@ const AdminView = () => {
                         onSubmit={handleUpdateMp3}
                         onCancel={() => setShowUpdateMp3Form(false)}
                         accept="audio/*"
-                        idSong = {currentSong? currentSong.id : null}
+                        idSong={currentSong ? currentSong.id : null}
                     />
                 </Modal.Body>
             </Modal>
