@@ -1,16 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Modal } from 'react-bootstrap';
 import SongList from './SongList';
 import SongForm from './SongForm';
 import SongDetails from './SongDetails';
 import UpdateFileForm from './UpdateFileForm';
+import Alertas from '../Alertas';
 
-const AdminView = ({ initialSongs }) => {
-    const [songs, setSongs] = useState(initialSongs);
+const AdminView = () => {
+    const [songs, setSongs] = useState([]);
     const [currentSong, setCurrentSong] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [showUpdatePhotoForm, setShowUpdatePhotoForm] = useState(false);
     const [showUpdateMp3Form, setShowUpdateMp3Form] = useState(false);
+
+    useEffect(() => {
+        const fetchSongs = async () => {
+            try {
+                const response = await fetch('http://localhost:4000/song/list', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Error al obtener las canciones');
+                }
+                const data = await response.json();
+                setSongs(data);
+            } catch (error) {
+                console.error('Error:', error);
+                Alertas.showToast(error.message, 'error');
+            }
+        };
+
+        fetchSongs();
+    }, []);
 
     const handleCreateOrUpdate = (newSong) => {
         if (currentSong) {
@@ -30,10 +54,13 @@ const AdminView = ({ initialSongs }) => {
         setSongs(
             songs.map((song) =>
                 song.nombre === currentSong.nombre
-                    ? { ...song, imagen: updatedPhoto }
+                    ? { ...song, url_caratula: updatedPhoto}
                     : song
             )
         );
+        //actualizamos la caratura de la cancion actual
+        let song = {...currentSong, url_caratula: updatedPhoto};
+        handleShowDetail(song);
         setShowUpdatePhotoForm(false);
     };
 
@@ -41,11 +68,13 @@ const AdminView = ({ initialSongs }) => {
         setSongs(
             songs.map((song) =>
                 song.nombre === currentSong.nombre
-                    ? { ...song, mp3: updatedMp3 }
+                    ? { ...song, url_mp3: updatedMp3 }
                     : song
             )
         );
+        let song = {...currentSong, url_mp3: updatedMp3};
         setShowUpdateMp3Form(false);
+        handleShowDetail(song);
     };
 
     const handleEdit = (song) => {
@@ -53,8 +82,28 @@ const AdminView = ({ initialSongs }) => {
         setShowForm(true);
     };
 
-    const handleDelete = (songName) => {
-        setSongs(songs.filter((song) => song.nombre !== songName));
+    const handleDelete = (songId) => {
+        // Eliminar la canción del servidor
+        fetch('http://localhost:4000/song/remove', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ idcancion: songId }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.status === 200) {
+                    Alertas.showToast(data.message, 'success');
+                    setSongs(songs.filter((song) => song.id !== songId));
+                } else {
+                    Alertas.showToast(data.message, 'error');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                Alertas.showToast(error.message, 'error');
+            });
     };
 
     const handleShowDetail = (song) => {
@@ -84,6 +133,9 @@ const AdminView = ({ initialSongs }) => {
                     <Button variant="primary" onClick={handleShowCreateForm}>
                         Crear Nueva Canción
                     </Button>
+                    <br />
+                    <br />
+                    <br />
                     <SongList
                         songs={songs}
                         onEdit={handleEdit}
@@ -121,6 +173,7 @@ const AdminView = ({ initialSongs }) => {
                         onSubmit={handleUpdatePhoto}
                         onCancel={() => setShowUpdatePhotoForm(false)}
                         accept="image/*"
+                        idSong = {currentSong? currentSong.id : null}
                     />
                 </Modal.Body>
             </Modal>
@@ -135,6 +188,7 @@ const AdminView = ({ initialSongs }) => {
                         onSubmit={handleUpdateMp3}
                         onCancel={() => setShowUpdateMp3Form(false)}
                         accept="audio/*"
+                        idSong = {currentSong? currentSong.id : null}
                     />
                 </Modal.Body>
             </Modal>

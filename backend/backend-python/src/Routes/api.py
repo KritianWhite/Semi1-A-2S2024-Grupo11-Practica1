@@ -25,6 +25,10 @@ def user_getuser():
 def user_update():
     return user['update']()
 
+@api_blueprint.route('/user/updatephoto', methods=['POST'])
+def user_updatephoto():
+    return user['updatephoto']()
+
 # Canciones
 @api_blueprint.route('/song/create', methods=['POST'])
 def song_create():

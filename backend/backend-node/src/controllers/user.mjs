@@ -1,8 +1,7 @@
 import * as bcrypt from "bcrypt";
 import { consult } from "../database/database.mjs";
 import config from "../config.mjs";
-
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { uploadImageS3 } from "../s3.mjs";
 
 const login = async (req, res) => {
   try {
@@ -80,7 +79,7 @@ const registro = async (req, res) => {
 
       const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
 
-      const path = `Fotos/${email+fechaHoraNumerica}.jpg`;
+      const path = `Fotos/${email + fechaHoraNumerica}.jpg`;
 
       const response = await uploadImageS3(buff, path);
 
@@ -244,7 +243,7 @@ const updatephoto = async (req, res) => {
 
       const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
 
-      const path = `Fotos/${email+fechaHoraNumerica}.jpg`;
+      const path = `Fotos/${email + fechaHoraNumerica}.jpg`;
 
       const response = await uploadImageS3(buff, path);
 
@@ -259,7 +258,7 @@ const updatephoto = async (req, res) => {
       xsql = `update usuario set url_imagen = '${url_imagen}' where id = ${id};`;
       const result2 = await consult(xsql);
       if (result2[0].status == 200) {
-        return res.status(200).json({status:200, message: "Foto de perfil actualizada" });
+        return res.status(200).json({ status: 200, message: "Foto de perfil actualizada" });
       } else {
         return res
           .status(500)
@@ -273,32 +272,6 @@ const updatephoto = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
-  }
-};
-
-//recibe un buffer y lo sube a S3
-const uploadImageS3 = async (buff, path) => {
-  const client = new S3Client({
-    region: config.region,
-    credentials: {
-      accessKeyId: config.accessKeyId,
-      secretAccessKey: config.secretAccessKey,
-    },
-  });
-
-  const command = new PutObjectCommand({
-    Bucket: config.bucket,
-    Key: path,
-    Body: buff,
-    ContentType: "image/jpeg",
-  });
-
-  try {
-    const response = await client.send(command);
-    return response;
-  } catch (error) {
-    console.error(error);
-    return null;
   }
 };
 
