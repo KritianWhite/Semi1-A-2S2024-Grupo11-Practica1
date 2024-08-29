@@ -125,6 +125,56 @@ const modify = async (req, res) => {
   }
 };
 
+const updatefoto = async (req, res) => {
+    try{
+      const {idplaylist, imagen} = req.body;
+      if(idplaylist === undefined || imagen === undefined){
+        return res.status(404).json({ status: 404, message: "Solicitud incorrecta. Por favor, rellene todos los campos." });
+      }
+
+      //verificar que la playlist exista
+      const check = await consult(`select * from playlist where id = '${idplaylist}';`);
+      if(check[0].status == 200 && check[0].result.length == 0){
+        return res.status(500).json({ status: 500, message: "Playlist no existe" });
+      }
+
+      //guardar la portada de la playlist en S3
+      const base64Data = imagen.replace(/^data:image\/\w+;base64,/, "");
+      const buff = Buffer.from(base64Data, "base64");
+      const fechaHoraActual = new Date();
+      const ano = fechaHoraActual.getFullYear().toString();
+      const mes = (fechaHoraActual.getMonth() + 1).toString().padStart(2, '0'); // Se agrega +1 porque los meses se indexan desde 0
+      const dia = fechaHoraActual.getDate().toString().padStart(2, '0');
+      const hora = fechaHoraActual.getHours().toString().padStart(2, '0');
+      const minutos = fechaHoraActual.getMinutes().toString().padStart(2, '0');
+      const segundos = fechaHoraActual.getSeconds().toString().padStart(2, '0');
+
+      const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
+
+      //eliminar los espacios en blanco y los puntos
+      const path = `Fotos/playlist${idplaylist + fechaHoraNumerica}.jpg`;
+
+      const response = await uploadImageS3(buff, path);
+
+      if (response == null){
+        return res.status(500).json({ status: 500, message: "Error al subir la imagen" });
+      }
+
+      const url_portada = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
+
+      const result = await consult(`update playlist set url_portada = '${url_portada}' where id = '${idplaylist}';`);
+
+      if(result[0].status == 200){
+        return res.status(200).json({ status: 200, message: "Imagen actualizada", url: url_portada });
+      }else{
+        return res.status(500).json({ status: 500, message: result[0].message });
+      }
+    }catch(error){
+      console.log(error);
+      return res.status(500).json({ status: 500, message: error.message });
+    }
+}
+
 const deletesong = async (req, res) => {
   try {
     const { iduser, idplaylist } = req.body;
@@ -278,4 +328,5 @@ export const playlist = {
   addsong,
   removesong,
   getsongs,
+  updatefoto,
 };

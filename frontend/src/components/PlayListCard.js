@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Button, Modal } from 'react-bootstrap';
 import TablaCanciones from './TablaCanciones';
 import PlayListForm from './playlist/PlayListForm.js';
 import Alertas from './Alertas.js';
+import UpdatePortadaForm from './playlist/UpdatePortadaForm.js';
 
 const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
   const [showForm, setShowForm] = useState(false);
@@ -69,9 +70,10 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
           : playlist
       )
     );
-    //actualizamos la caratura de la cancion actual
-    let playlist = { ...playlist, url_portada: updatedPhoto };
     setShowUpdatePhotoForm(false);
+    setSelectedPlaylist(null);
+    setShowForm(false);
+    setShowSongs(false);
   };
 
   const handleEdit = (playlist) => {
@@ -93,12 +95,14 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
     setShowForm(false);
     setSelectedPlaylist(null);
     setShowSongs(false);
+    setShowUpdatePhotoForm(false);
   };
 
   const handleVolver = () => {
     setSelectedPlaylist(null);
     setShowSongs(false);
     setShowForm(false);
+    setShowUpdatePhotoForm(false);
   }
 
 
@@ -148,7 +152,7 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
                         <Button
                           variant="button"
                           title='Cambiar Portada'
-                          onClick={(e) => {}}
+                          onClick={(e) => {e.stopPropagation(); handleShowUpdatePhotoForm(playlist);}}
                         >
                           <i className="bi bi-images"></i>
                         </Button>
@@ -183,6 +187,19 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
               />
             </Modal.Body>
           </Modal>
+
+          <Modal show={showUpdatePhotoForm} onHide={() => handleCancel()}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Actualizar Foto</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <UpdatePortadaForm
+                        onSubmit={handleUpdatePhoto}
+                        onCancel={() => handleCancel()}
+                        idPlayList = {selectedPlaylist? selectedPlaylist.id : null}
+                    />
+                </Modal.Body>
+            </Modal>
         </>
       )}
     </Container>
