@@ -35,7 +35,7 @@ const SongList = ({ songs = [], onEdit, onDelete, onShowDetail, onUpdatePhoto, o
 
   return (
     <>
-      <InputGroup className="mb-3">
+      <InputGroup className="mb-3" style={{ position: 'relative', zIndex: 1 }}>
         <FormControl
           placeholder="Buscar Canción"
           aria-label="Buscar Canción"

@@ -1,16 +1,12 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { Table, Button, Container, Row, Col } from 'react-bootstrap';
-import Alertas from './Alertas';
+import { PlayerContext } from '../context/PlayerContext'; // Asegúrate de que la ruta sea correcta
 
-const TablaCanciones = ({ songs, userId, onToggleFavorite }) => {
-  const [currentSong, setCurrentSong] = useState(null);
+const TablaCanciones = ({ songs, onToggleFavorite }) => {
+  const { playSong } = useContext(PlayerContext); // Importa la función playSong del contexto
 
-  const handlePlayPause = (index) => {
-    if (currentSong === index) {
-      setCurrentSong(null); // Pausar la canción actual
-    } else {
-      setCurrentSong(index); // Reproducir una nueva canción
-    }
+  const handlePlayPause = (song) => {
+    playSong(song);  // Enviar la canción seleccionada al reproductor
   };
 
   return (
@@ -25,24 +21,16 @@ const TablaCanciones = ({ songs, userId, onToggleFavorite }) => {
         </thead>
         <tbody>
           {songs.map((song, index) => (
-            <tr
-              key={index}
-              className={`align-middle ${currentSong === index ? 'bg-dark text-white' : ''}`}
-              style={{
-                borderRadius: '10px',
-                border: '1px solid #E9ECEF',
-                marginBottom: '15px',
-              }}
-            >
+            <tr key={index} className="align-middle">
               <td className="p-3">
                 <Row className="align-items-center">
                   <Col xs="auto">
                     <Button
                       variant="link"
-                      onClick={() => handlePlayPause(index)}
+                      onClick={() => handlePlayPause(song)}
                       className="text-dark"
                     >
-                      <i className={`bi ${currentSong === index ? 'bi-pause-circle' : 'bi-play-circle'}`}></i>
+                      <i className="bi bi-play-circle"></i>
                     </Button>
                   </Col>
                   <Col>{song.nombre}</Col>

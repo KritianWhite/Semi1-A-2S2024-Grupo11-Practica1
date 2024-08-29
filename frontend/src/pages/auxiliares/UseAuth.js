@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+
+import { PlayerContext } from '../../context/PlayerContext';
 
 const UseAuth = () => {
     const [authData, setAuthData] = useState({ userId: null, isAdmin: false });
+    const {resetSong} = useContext(PlayerContext);
 
     useEffect(() => {
         // Obtén los valores almacenados en el localStorage al cargar el hook
@@ -24,6 +27,7 @@ const UseAuth = () => {
         // Elimina los datos del localStorage al hacer logout
         localStorage.removeItem('authData');
         setAuthData({ userId: null, isAdmin: false });
+        resetSong();
     };
 
     const hasAccessToRoute = (route) => {
