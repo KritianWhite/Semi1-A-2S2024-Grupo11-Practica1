@@ -1,4 +1,6 @@
 import { consult } from "../database/database.mjs";
+import { uploadImageS3 } from "../s3.mjs";
+import config from "../config.mjs";
 
 const create = async (req, res) => {
   try {
@@ -16,16 +18,46 @@ const create = async (req, res) => {
       });
     }
 
+    //guardar la portada de la playlist en S3
+    const base64Data = portada.replace(/^data:image\/\w+;base64,/, "");
+    const buff = Buffer.from(base64Data, "base64");
+    const fechaHoraActual = new Date();
+    const ano = fechaHoraActual.getFullYear().toString();
+    const mes = (fechaHoraActual.getMonth() + 1).toString().padStart(2, '0'); // Se agrega +1 porque los meses se indexan desde 0
+    const dia = fechaHoraActual.getDate().toString().padStart(2, '0');
+    const hora = fechaHoraActual.getHours().toString().padStart(2, '0');
+    const minutos = fechaHoraActual.getMinutes().toString().padStart(2, '0');
+    const segundos = fechaHoraActual.getSeconds().toString().padStart(2, '0');
+
+    const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
+
+    //eliminar los espacios en blanco y los puntos
+    const nombreSinEspacios = nombre.replace(/\s/g, '').replace(/\./g, '');
+
+    const path = `Fotos/${nombreSinEspacios + fechaHoraNumerica}.jpg`;
+
+    const response = await uploadImageS3(buff, path);
+
+    if (response == null){
+      return res.status(500).json({ status: 500, message: "Error al subir la imagen" });
+    }
+
+    const url_portada = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
+
     const result =
       await consult(`insert into playlist (nombre, descripcion, url_portada, id_user, eliminada) 
-            values ('${nombre}', '${descripcion}', '${portada}', '${iduser}', 0);`);
+            values ('${nombre}', '${descripcion}', '${url_portada}', '${iduser}', 0);`);
 
     if (result[0].status == 200) {
-      return res.status(200).json({ message: "Playlist creada" });
+      //obtenemos el id de la playlist creada
+      const idplaylist = result[0].result.insertId;
+
+      return res.status(200).json({status: 200, message: "Playlist creada", id: idplaylist});
     } else {
       return res.status(500).json({ status: 500, message: result[0].message });
     }
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
   }
 };
@@ -41,11 +73,11 @@ const getall = async (req, res) => {
       });
     }
 
-    let xsql = `select id as idplaylist, nombre, descripcion, url_portada as portada
+    let xsql = `select id, nombre, descripcion, url_portada
      from playlist where id_user = '${iduser}' and eliminada = 0;`;
     let result = await consult(xsql);
     if (result[0].status == 200) {
-      return res.status(200).json(result[0].result );
+      return res.status(200).json(result[0].result);
     } else {
       return res.status(500).json({ status: 500, message: result[0].message });
     }
@@ -56,13 +88,12 @@ const getall = async (req, res) => {
 
 const modify = async (req, res) => {
   try {
-    const { iduser, idplaylist, nombre, descripcion, portada } = req.body;
+    const { iduser, idplaylist, nombre, descripcion } = req.body;
     if (
       iduser === undefined ||
       idplaylist === undefined ||
       nombre === undefined ||
-      descripcion === undefined ||
-      portada === undefined
+      descripcion === undefined
     ) {
       return res.status(404).json({
         status: 404,
@@ -75,9 +106,9 @@ const modify = async (req, res) => {
 
     if (result[0].status == 200 && result[0].result.length > 0) {
       result = await consult(`update playlist set nombre = '${nombre}',
-         descripcion = '${descripcion}', url_portada = '${portada}' where id = '${idplaylist}' and id_user = '${iduser}';`);
+         descripcion = '${descripcion}' where id = '${idplaylist}' and id_user = '${iduser}';`);
       if (result[0].status == 200) {
-        return res.status(200).json({ message: "Playlist modificada" });
+        return res.status(200).json({ status: 200, message: "Playlist modificada" });
       } else {
         return res
           .status(500)
@@ -94,10 +125,61 @@ const modify = async (req, res) => {
   }
 };
 
-const deletesong = async (req, res) => {
+const updatefoto = async (req, res) => {
+    try{
+      const {idplaylist, imagen} = req.body;
+      if(idplaylist === undefined || imagen === undefined){
+        return res.status(404).json({ status: 404, message: "Solicitud incorrecta. Por favor, rellene todos los campos." });
+      }
+
+      //verificar que la playlist exista
+      const check = await consult(`select * from playlist where id = '${idplaylist}';`);
+      if(check[0].status == 200 && check[0].result.length == 0){
+        return res.status(500).json({ status: 500, message: "Playlist no existe" });
+      }
+
+      //guardar la portada de la playlist en S3
+      const base64Data = imagen.replace(/^data:image\/\w+;base64,/, "");
+      const buff = Buffer.from(base64Data, "base64");
+      const fechaHoraActual = new Date();
+      const ano = fechaHoraActual.getFullYear().toString();
+      const mes = (fechaHoraActual.getMonth() + 1).toString().padStart(2, '0'); // Se agrega +1 porque los meses se indexan desde 0
+      const dia = fechaHoraActual.getDate().toString().padStart(2, '0');
+      const hora = fechaHoraActual.getHours().toString().padStart(2, '0');
+      const minutos = fechaHoraActual.getMinutes().toString().padStart(2, '0');
+      const segundos = fechaHoraActual.getSeconds().toString().padStart(2, '0');
+
+      const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
+
+      //eliminar los espacios en blanco y los puntos
+      const path = `Fotos/playlist${idplaylist + fechaHoraNumerica}.jpg`;
+
+      const response = await uploadImageS3(buff, path);
+
+      if (response == null){
+        return res.status(500).json({ status: 500, message: "Error al subir la imagen" });
+      }
+
+      const url_portada = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
+
+      const result = await consult(`update playlist set url_portada = '${url_portada}' where id = '${idplaylist}';`);
+
+      if(result[0].status == 200){
+        return res.status(200).json({ status: 200, message: "Imagen actualizada", url: url_portada });
+      }else{
+        return res.status(500).json({ status: 500, message: result[0].message });
+      }
+    }catch(error){
+      console.log(error);
+      return res.status(500).json({ status: 500, message: error.message });
+    }
+}
+
+
+const deleteplaylist = async (req, res) => {
   try {
-    const { iduser, idplaylist } = req.body;
-    if (iduser === undefined || idplaylist === undefined) {
+    const { idplaylist } = req.body;
+    if (idplaylist === undefined) {
       return res.status(404).json({
         status: 404,
         message: "Solicitud incorrecta. Por favor, rellene todos los campos.",
@@ -105,11 +187,11 @@ const deletesong = async (req, res) => {
     }
 
     const result = await consult(
-      `update playlist set eliminada = 1 where id = '${idplaylist}' and id_user = '${iduser}';`
+      `update playlist set eliminada = 1 where id = '${idplaylist}';`
     );
 
     if (result[0].status == 200 && result[0].result.affectedRows > 0) {
-      return res.status(200).json({ message: "Playlist eliminada" });
+      return res.status(200).json({status:200, message: "Playlist eliminada" });
     } else {
       return res
         .status(500)
@@ -243,8 +325,9 @@ export const playlist = {
   create,
   getall,
   modify,
-  deletesong,
+  deleteplaylist,
   addsong,
   removesong,
   getsongs,
+  updatefoto,
 };

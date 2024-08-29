@@ -7,23 +7,18 @@ import PlayListCard from '../components/PlayListCard';
 
 const Playlist = () => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [songs, setSongs] = useState([]);
     const { isAdmin } = UseAuth();
+    const [userid, setUserId] = useState();
 
-    const playlists = [
-        {
-            idplaylist: 1,
-            nombre: "playlist1",
-            descripcion: "esta es una playlist",
-            portada: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrSbD-LQphj1tRogL4XQBW7wLTCwYdUktQ2Q&s", // Base64 de la imagen
-        },
-        {
-            idplaylist: 2,
-            nombre: "playlist2",
-            descripcion: "esta es una playlist",
-            portada: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrSbD-LQphj1tRogL4XQBW7wLTCwYdUktQ2Q&s", // Base64 de la imagen
-        },
-        // Otras playlists
-    ];
+    useEffect(() => {
+        // Obtenemos el id del usuario almacenado en el localStorage
+        let storedAuthData = JSON.parse(localStorage.getItem('authData'));
+        let storedUserId = storedAuthData.userId;
+
+        setUserId(storedUserId);
+    }, []);
+
 
     const fetchSongs = async ({ idplaylist }) => {
         // Aquí realizarías la llamada a tu API para obtener las canciones
