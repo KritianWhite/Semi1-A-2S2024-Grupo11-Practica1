@@ -6,13 +6,14 @@ import Alertas from './Alertas.js';
 
 const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
   const [showForm, setShowForm] = useState(false);
+  const [showSongs, setShowSongs] = useState(false);
   const [showUpdatePhotoForm, setShowUpdatePhotoForm] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
 
   const handlePlaylistClick = async (playlistId) => {
     setSelectedPlaylist(playlistId);
-
+    setShowSongs(true);
     // Enviar el idplaylist y actualizar las canciones
     const fetchedSongs = await fetchSongs({ idplaylist: playlistId });
     //setSongs(fetchedSongs);
@@ -88,13 +89,24 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
     setShowUpdatePhotoForm(true);
   };
 
+  const handleCancel = () => {
+    setShowForm(false);
+    setSelectedPlaylist(null);
+    setShowSongs(false);
+  };
+
+  const handleVolver = () => {
+    setSelectedPlaylist(null);
+    setShowSongs(false);
+    setShowForm(false);
+  }
 
 
   return (
     <Container>
-      {selectedPlaylist ? (
+      {selectedPlaylist && showSongs ? (
         <>
-          <Button variant="link" onClick={() => setSelectedPlaylist(null)}>Volver</Button>
+          <Button variant="link" onClick={() => handleVolver()}>Volver</Button>
           <TablaCanciones songs={songs} />
         </>
       ) : (
@@ -113,18 +125,52 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
           <Row>
             {playlists.map((playlist) => (
               <Col key={playlist.id} xs={6} md={4} lg={3} className="mb-4">
-                <Card onClick={() => handlePlaylistClick(playlist.id)} className="h-100 cursor-pointer">
-                  <Card.Img variant="top" src={playlist.url_portada} alt={playlist.nombre} />
+                <Card className="h-100 cursor-pointer" style={{cursor:'pointer'}}>
+                  <Card.Img variant="top" onClick={() => handlePlaylistClick(playlist.id)} src={playlist.url_portada} alt={playlist.nombre} />
                   <Card.Body>
-                    <Card.Title>{playlist.nombre}</Card.Title>
-                    <Card.Text>{playlist.descripcion}</Card.Text>
+                    <Card.Title onClick={() => handlePlaylistClick(playlist.id)}>{playlist.nombre}</Card.Title>
+                    <Card.Text onClick={() => handlePlaylistClick(playlist.id)}>{playlist.descripcion}</Card.Text>
+                    <Row>
+                      <Col></Col>
+                      <Col>
+                        <Button
+                          variant="button"
+                          title='Editar'
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(playlist);
+                          }}
+                        >
+                          <i className="bi bi-pencil-square"></i>
+                        </Button>
+                      </Col>
+                      <Col>
+                        <Button
+                          variant="button"
+                          title='Cambiar Portada'
+                          onClick={(e) => {}}
+                        >
+                          <i className="bi bi-images"></i>
+                        </Button>
+                      </Col>
+                      <Col>
+                        <Button
+                          variant="button"
+                          title='Eliminar'
+                          onClick={(e) => {}}
+                        >
+                          <i className="bi bi-trash"></i>
+                        </Button>
+                      </Col>
+                      
+                    </Row>
                   </Card.Body>
                 </Card>
               </Col>
             ))}
           </Row>
 
-          <Modal show={showForm} onHide={() => setShowForm(false)}>
+          <Modal show={showForm} onHide={() => handleCancel()}>
             <Modal.Header closeButton>
               <Modal.Title>{selectedPlaylist ? 'Actualizar Playlist' : 'Nueva Playlist'}</Modal.Title>
             </Modal.Header>
@@ -132,7 +178,7 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
               <PlayListForm
                 initialData={selectedPlaylist}
                 onSubmit={handleCreateOrUpdate}
-                onCancel={() => setShowForm(false)}
+                onCancel={() => handleCancel()}
                 idUser={iduser}
               />
             </Modal.Body>

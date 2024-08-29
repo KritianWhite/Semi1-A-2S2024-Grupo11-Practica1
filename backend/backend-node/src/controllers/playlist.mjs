@@ -88,13 +88,12 @@ const getall = async (req, res) => {
 
 const modify = async (req, res) => {
   try {
-    const { iduser, idplaylist, nombre, descripcion, portada } = req.body;
+    const { iduser, idplaylist, nombre, descripcion } = req.body;
     if (
       iduser === undefined ||
       idplaylist === undefined ||
       nombre === undefined ||
-      descripcion === undefined ||
-      portada === undefined
+      descripcion === undefined
     ) {
       return res.status(404).json({
         status: 404,
@@ -107,9 +106,9 @@ const modify = async (req, res) => {
 
     if (result[0].status == 200 && result[0].result.length > 0) {
       result = await consult(`update playlist set nombre = '${nombre}',
-         descripcion = '${descripcion}', url_portada = '${portada}' where id = '${idplaylist}' and id_user = '${iduser}';`);
+         descripcion = '${descripcion}' where id = '${idplaylist}' and id_user = '${iduser}';`);
       if (result[0].status == 200) {
-        return res.status(200).json({ message: "Playlist modificada" });
+        return res.status(200).json({ status: 200, message: "Playlist modificada" });
       } else {
         return res
           .status(500)

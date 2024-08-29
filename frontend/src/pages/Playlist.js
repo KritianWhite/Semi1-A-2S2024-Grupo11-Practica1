@@ -64,15 +64,18 @@ const Playlist = () => {
                         className={`transition-col content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
                         style={{ transition: 'all 0.5s ease-in-out', overflowX: 'hidden' }}
                     >
-                        {/* Aquí va contenido principal */}
-                        <div className="d-flex justify-content-center align-items-center min-vh-100" style={{ overflow: 'hidden' }}>
-                            <PlayListCard songs={songs} fetchSongs={fetchSongs} iduser={userid} />
-                        </div>
-
-                        {/* Reproductor fijo en la parte inferior */}
-                        <div style={{ position: 'fixed', bottom: 0, left: isExpanded ? '250px' : '80px', right: 0, transition: 'left 0.5s ease-in-out', zIndex: 1000 }}>
-                            <Reproductor />
-                        </div>
+                        <Row>
+                            {/* Aquí va contenido principal */}
+                            <div className="d-flex justify-content-center align-items-center min-vh-100" style={{ overflow: 'hidden', marginBottom :'100px' }}>
+                                <PlayListCard songs={songs} fetchSongs={fetchSongs} iduser={userid} />
+                            </div>
+                        </Row>
+                        <Row>
+                            {/* Reproductor fijo en la parte inferior */}
+                            <div style={{ position: 'fixed', bottom: 0, left: isExpanded ? '250px' : '80px', right: 0, transition: 'left 0.5s ease-in-out', zIndex: 1000 }}>
+                                <Reproductor />
+                            </div>
+                        </Row>
                     </Col>
                 </Row>
             </Container>
