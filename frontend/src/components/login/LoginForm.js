@@ -25,19 +25,23 @@ const LoginForm = () => {
             },
             body: JSON.stringify(data)
         })
-            .then(response => response.json())
-            .then(data => {
-                if(data.role === 1){
-                    login(data.id, true);
-                    navigate('/Inicio');
-                }else if(data.role === 2){
-                    login(data.id, false);
-                    navigate('/Inicio');
+            .then((response) => response.json())
+            .then((data) => {
+                if(data.status !== 200){
+                    Alertas.showToast(data.message, 'error');
+                }else{
+                    if(data.role === 1){
+                        login(data.iduser, true);
+                        navigate('/Inicio');
+                    }else if(data.role === 2){
+                        login(data.iduser, false);
+                        navigate('/Inicio');
+                    }
                 }
             })
             .catch((error) => {
                 console.error('Error:', error);
-                Alertas.showToast('error', 'Ocurrío un error al iniciar sesión');
+                Alertas.showToast('Ocurrío un error al iniciar sesión', 'error');
         });
 
     };

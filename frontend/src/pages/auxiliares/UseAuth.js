@@ -13,10 +13,11 @@ const UseAuth = () => {
     }, []);
 
     const login = (id, isAdminStatus) => {
-        // Crea un objeto con los datos de autenticación
+        // Asegúrate de que isAdminStatus sea true si el usuario es administrador
         const data = { userId: id, isAdmin: isAdminStatus };
         localStorage.setItem('authData', JSON.stringify(data));
         setAuthData(data);
+        console.log('Login data set:', data); // Verifica que los datos sean correctos
     };
 
     const logout = () => {
@@ -30,7 +31,11 @@ const UseAuth = () => {
             '/dashboard-admin',
         ];
 
-        if (adminRoutes.includes(route) && !authData.isAdmin) {
+        // Convierte la ruta a minúsculas para asegurar una comparación precisa
+        const lowerCaseRoute = route.toLowerCase();
+        const storedAuthData = JSON.parse(localStorage.getItem('authData'));
+
+        if (adminRoutes.includes(route) && !storedAuthData.isAdmin) {
             return false; // No tiene acceso
         }
         return true; // Tiene acceso

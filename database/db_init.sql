@@ -29,8 +29,8 @@ CREATE TABLE `cancion` (
   `id` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(65) NOT NULL,
   `duracion` time NOT NULL,
-  `url_caratula` varchar(100) NOT NULL,
-  `url_mp3` varchar(100) NOT NULL,
+  `url_caratula` varchar(200) NOT NULL,
+  `url_mp3` varchar(200) NOT NULL,
   `artista` varchar(65) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -85,7 +85,7 @@ CREATE TABLE `playlist` (
   `id` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(65) NOT NULL,
   `descripcion` varchar(100) NOT NULL,
-  `url_portada` varchar(100) NOT NULL,
+  `url_portada` varchar(200) NOT NULL,
   `id_user` int NOT NULL,
   `eliminada` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
@@ -119,7 +119,7 @@ CREATE TABLE `usuario` (
   `id` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(65) NOT NULL,
   `apellido` varchar(65) NOT NULL,
-  `url_imagen` varchar(100) NOT NULL,
+  `url_imagen` varchar(200) NOT NULL,
   `password` varchar(80) NOT NULL,
   `email` varchar(65) NOT NULL,
   `nacimiento` date NOT NULL,

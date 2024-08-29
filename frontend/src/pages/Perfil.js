@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 
 import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
 import PerfilForm from '../components/PerfilForm';
 import Reproductor from '../components/Reproductor';
+import Alertas from '../components/Alertas';
 
 const Perfil = () => {
     const [isExpanded, setIsExpanded] = useState(false);
