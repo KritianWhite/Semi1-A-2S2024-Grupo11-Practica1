@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Col } from 'react-bootstrap';
 import { useLocation, Navigate } from 'react-router-dom';
 
 import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
 import TablaCanciones from '../components/TablaCanciones';
-import Reproductor from '../components/Reproductor';
 import Alertas from '../components/Alertas';
 
 const Favoritos = () => {
@@ -87,31 +86,18 @@ const Favoritos = () => {
 
     return (
         <>
-            <Container fluid>
-                <Row>
-                    <Col xs={isExpanded ? 3 : 1}
-                        className={`p-0 transition-col sidebar-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
-                        onMouseEnter={() => setIsExpanded(true)}
-                        onMouseLeave={() => setIsExpanded(false)} style={{ transition: 'all 0.5s ease-in-out' }}>
-                        <Sidebar isAdmin={isAdmin} />
-                    </Col>
-                    <Col
-                        xs={isExpanded ? 9 : 11}
-                        className={`transition-col content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
-                        style={{ transition: 'all 0.5s ease-in-out', overflowX: 'hidden' }}
-                    >
-                        {/* Aquí va contenido principal */}
-                        <div className="d-flex justify-content-center align-items-center min-vh-100" style={{ overflow: 'hidden' }}>
-                            <h1>TUS FAVORITOS</h1>
-                            <TablaCanciones songs={songs} onToggleFavorite={handleToggleFavorite} userId={userid} screen={'favorites'} />
-                        </div>
-
-                        {/* Reproductor fijo en la parte inferior */}
-                        <div style={{ position: 'fixed', bottom: 0, left: isExpanded ? '250px' : '80px', right: 0, transition: 'left 0.5s ease-in-out', zIndex: 1000 }}>
-                            <Reproductor />
-                        </div>
-                    </Col>
-                </Row>
+            <Container>
+                <Col xs="auto">
+                    <Sidebar isAdmin={isAdmin} />
+                </Col>
+                <Col xs="auto">
+                    {/* Aquí va contenido principal */}
+                    <h1>TUS FAVORITOS</h1>
+                    <div className="d-flex justify-content-center align-items-center">
+                        <TablaCanciones songs={songs} onToggleFavorite={handleToggleFavorite} userId={userid} screen={'favorites'} />
+                    </div>
+                </Col>
+                            
             </Container>
         </>
     );

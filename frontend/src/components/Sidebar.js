@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Nav, Image, Row, Col } from 'react-bootstrap';
-import './styles/Sidebar.css'; // Archivo CSS personalizado
+import './styles/Sidebar.css';
 import UseAuth from '../pages/auxiliares/UseAuth';
 
 const Sidebar = ({ isAdmin }) => {
@@ -22,6 +22,13 @@ const Sidebar = ({ isAdmin }) => {
             <Navbar.Brand className="d-flex align-items-center justify-content-center">
                 <i className="bi bi-music-note-list logo-icon"></i>
                 {isExpanded && <span>SOUNDSTREAM</span>}
+                {isExpanded && (
+                    <Col xs="auto" className="d-flex align-items-center">
+                        <Link to="/Login" onClick={handleLogout} className="text-white">
+                            <i className="bi bi-box-arrow-right" style={{ fontSize: '1.5rem', marginLeft: "1rem" }}></i>
+                        </Link>
+                    </Col>
+                )}
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
@@ -66,22 +73,6 @@ const Sidebar = ({ isAdmin }) => {
                     )}
                 </Nav>
             </Navbar.Collapse>
-            <Row className="profile-section align-items-center justify-content-between">
-                <Col xs="auto" className="d-flex align-items-center">
-                    <Image src="https://sigie.maga.gob.gt/Images/individualf.png" roundedCircle alt="Album Art"
-                        style={{ width: '40px', height: '40px', borderRadius: '5px' }}/>
-                    {isExpanded && (
-                        <p className="text-white mb-0 ml-2">Nombre Usuario</p>
-                    )}
-                </Col>
-                {isExpanded && (
-                    <Col xs="auto" className="d-flex align-items-center">
-                        <Link to="/Login" onClick={handleLogout} className="text-white">
-                            <i className="bi bi-box-arrow-right" style={{ fontSize: '1.5rem' }}></i>
-                        </Link>
-                    </Col>
-                )}
-            </Row>
         </Navbar>
     );
 };

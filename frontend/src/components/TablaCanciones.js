@@ -1,19 +1,17 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Table, Button, Container, Row, Col, Modal } from 'react-bootstrap';
+import { PlayerContext } from '../context/PlayerContext'; // Asegúrate de que la ruta sea correcta
 import Alertas from './Alertas';
 import AddToPlaylistForm from './playlist/AddToPlaylistForm';
 
 const TablaCanciones = ({ songs, userId, onToggleFavorite, screen, playlistId, removeSongFromPlayList }) => {
+  const { playSong } = useContext(PlayerContext); // Importa la función playSong del contexto
   const [currentSong, setCurrentSong] = useState(null); //para la reproducción de canciones
   const [showFormPlaylist, setShowFormPlaylist] = useState(false); //para mostrar el modal de agregar a playlist
   const [songToPlaylist, setSongToPlaylist] = useState(null); //para guardar la canción a agregar a un playlist
 
-  const handlePlayPause = (index) => {
-    if (currentSong === index) {
-      setCurrentSong(null); // Pausar la canción actual
-    } else {
-      setCurrentSong(index); // Reproducir una nueva canción
-    }
+  const handlePlayPause = (song) => {
+    playSong(song);  // Enviar la canción seleccionada al reproductor
   };
 
   const handleCancelForm = () => {
@@ -78,19 +76,14 @@ const TablaCanciones = ({ songs, userId, onToggleFavorite, screen, playlistId, r
             songs.map((song, index) => (
               <tr
                 key={index}
-                className={`align-middle ${currentSong === index ? 'bg-dark text-white' : ''}`}
-                style={{
-                  borderRadius: '10px',
-                  border: '1px solid #E9ECEF',
-                  marginBottom: '15px',
-                }}
+                className="align-middle"
               >
                 <td className="p-3">
                   <Row className="align-items-center">
                     <Col xs="auto">
                       <Button
                         variant="link"
-                        onClick={() => handlePlayPause(index)}
+                        onClick={() => handlePlayPause(song)}
                         className="text-dark"
                       >
                         <i className={`bi ${currentSong === index ? 'bi-pause-circle' : 'bi-play-circle'}`}></i>
