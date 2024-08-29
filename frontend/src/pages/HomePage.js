@@ -98,7 +98,7 @@ const AdminPage = () => {
             <h1>Bienvenido a SOUNDSTREAM</h1>
             <div className="d-flex justify-content-center align-items-center min-vh-100" style={{ overflow: 'hidden' }}>
             <h2>Ultimos Lanzamientos</h2>
-              <TablaCanciones songs={songs} onToggleFavorite={handleToggleFavorite} userId={userid} />
+              <TablaCanciones songs={songs} onToggleFavorite={handleToggleFavorite} userId={userid} screen={'home'} />
             </div>
 
             {/* Reproductor fijo en la parte inferior */}
