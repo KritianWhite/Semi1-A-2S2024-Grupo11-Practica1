@@ -158,7 +158,7 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
           <Row>
             {playlists.map((playlist) => (
               <Col key={playlist.id} xs={6} md={4} lg={3} className="mb-4">
-                <Card className="h-100 cursor-pointer" style={{cursor:'pointer'}}>
+                <Card className="h-100 cursor-pointer" style={{ cursor: 'pointer' }}>
                   <Card.Img variant="top" onClick={() => handlePlaylistClick(playlist.id)} src={playlist.url_portada} alt={playlist.nombre} />
                   <Card.Body>
                     <Card.Title onClick={() => handlePlaylistClick(playlist.id)}>{playlist.nombre}</Card.Title>
@@ -181,7 +181,7 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
                         <Button
                           variant="button"
                           title='Cambiar Portada'
-                          onClick={(e) => {e.stopPropagation(); handleShowUpdatePhotoForm(playlist);}}
+                          onClick={(e) => { e.stopPropagation(); handleShowUpdatePhotoForm(playlist); }}
                         >
                           <i className="bi bi-images"></i>
                         </Button>
@@ -190,12 +190,12 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
                         <Button
                           variant="button"
                           title='Eliminar'
-                          onClick={(e) => {e.stopPropagation(); handleDelete(playlist);}}
+                          onClick={(e) => { e.stopPropagation(); handleDelete(playlist); }}
                         >
                           <i className="bi bi-trash"></i>
                         </Button>
                       </Col>
-                      
+
                     </Row>
                   </Card.Body>
                 </Card>
@@ -218,17 +218,17 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
           </Modal>
 
           <Modal show={showUpdatePhotoForm} onHide={() => handleCancel()}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Actualizar Foto</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <UpdatePortadaForm
-                        onSubmit={handleUpdatePhoto}
-                        onCancel={() => handleCancel()}
-                        idPlayList = {selectedPlaylist? selectedPlaylist.id : null}
-                    />
-                </Modal.Body>
-            </Modal>
+            <Modal.Header closeButton>
+              <Modal.Title>Actualizar Foto</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <UpdatePortadaForm
+                onSubmit={handleUpdatePhoto}
+                onCancel={() => handleCancel()}
+                idPlayList={selectedPlaylist ? selectedPlaylist.id : null}
+              />
+            </Modal.Body>
+          </Modal>
         </>
       )}
     </Container>

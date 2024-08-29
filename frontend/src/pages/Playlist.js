@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Container, Col } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
 
 import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
