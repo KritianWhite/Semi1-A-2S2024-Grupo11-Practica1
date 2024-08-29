@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Container, Col } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
 
 import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
@@ -50,15 +50,14 @@ const Playlist = () => {
 
     return (
         <>
-            <Container>
+            <Container fluid>
                 <Col xs="auto">
                     <Sidebar isAdmin={isAdmin} />
                 </Col>
                 <Col xs="auto">
                     {/* Aquí va contenido principal */}
-                    <h1 className="mb-4">Playlist</h1>
-                    <div className="d-flex justify-content-center align-items-center">
-                        <PlayListCard playlists={playlists} fetchSongs={fetchSongs} />
+                    <div className="d-flex justify-content-center align-items-center min-vh-100" style={{ overflow: 'hidden', marginBottom: '100px' }}>
+                        <PlayListCard songs={songs} fetchSongs={fetchSongs} iduser={userid} />
                     </div>
                 </Col>
             </Container>
