@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 
 import UseAuth from './auxiliares/UseAuth';
@@ -8,23 +8,18 @@ import Reproductor from '../components/Reproductor';
 
 const Playlist = () => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [songs, setSongs] = useState([]);
     const { isAdmin } = UseAuth();
+    const [userid, setUserId] = useState();
 
-    const playlists = [
-        {
-            idplaylist: 1,
-            nombre: "playlist1",
-            descripcion: "esta es una playlist",
-            portada: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrSbD-LQphj1tRogL4XQBW7wLTCwYdUktQ2Q&s", // Base64 de la imagen
-        },
-        {
-            idplaylist: 2,
-            nombre: "playlist2",
-            descripcion: "esta es una playlist",
-            portada: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrSbD-LQphj1tRogL4XQBW7wLTCwYdUktQ2Q&s", // Base64 de la imagen
-        },
-        // Otras playlists
-    ];
+    useEffect(() => {
+        // Obtenemos el id del usuario almacenado en el localStorage
+        let storedAuthData = JSON.parse(localStorage.getItem('authData'));
+        let storedUserId = storedAuthData.userId;
+
+        setUserId(storedUserId);
+    }, []);
+
 
     const fetchSongs = async ({ idplaylist }) => {
         // Aquí realizarías la llamada a tu API para obtener las canciones
@@ -71,7 +66,7 @@ const Playlist = () => {
                     >
                         {/* Aquí va contenido principal */}
                         <div className="d-flex justify-content-center align-items-center min-vh-100" style={{ overflow: 'hidden' }}>
-                            <PlayListCard playlists={playlists} fetchSongs={fetchSongs} />
+                            <PlayListCard songs={songs} fetchSongs={fetchSongs} iduser={userid} />
                         </div>
 
                         {/* Reproductor fijo en la parte inferior */}
