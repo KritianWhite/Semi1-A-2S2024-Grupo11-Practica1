@@ -59,13 +59,13 @@ const RadioCard = ({ songs }) => {
       {currentSong ? (
         <>
           <Image
-            src={currentSong.url_imagen || "https://i.pinimg.com/236x/57/3c/18/573c189ea32ea0e5a4c06a508ad7462c.jpg"}
+            src={currentSong.url_caratula || "https://i.pinimg.com/236x/57/3c/18/573c189ea32ea0e5a4c06a508ad7462c.jpg"}
             rounded
             className="mb-4"
             style={{ width: '250px', height: '250px', objectFit: 'cover' }}
           />
           <h2 className="text-center">{currentSong.nombre}</h2>
-          <p className="text-center text-muted">{currentSong.artista}</p>
+          <p className="text-center">{currentSong.artista}</p>
           <audio id="audio-player" src={currentSong.url_mp3} autoPlay />
           <div className="d-flex align-items-center justify-content-center mt-3">
             <Button variant="link" className="text-white mx-3" onClick={handlePlayPause}>

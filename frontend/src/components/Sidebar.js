@@ -40,6 +40,12 @@ const Sidebar = ({ isAdmin }) => {
                         </Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
+                        <Nav.Link as={Link} to="/search" className="d-flex align-items-center">
+                            <i className="bi bi-search"></i>
+                            {isExpanded && <span>Busqueda</span>}
+                        </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
                         <Nav.Link as={Link} to="/Perfil" className="d-flex align-items-center">
                             <i className="bi bi-person"></i>
                             {isExpanded && <span>Perfil</span>}

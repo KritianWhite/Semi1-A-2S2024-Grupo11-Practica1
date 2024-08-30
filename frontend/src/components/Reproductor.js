@@ -65,7 +65,7 @@ const Reproductor = () => {
                     </Col>
                 </Row>
             ) : (
-                <p className="text-center mb-0">No hay canción seleccionada</p>
+                <p className="text-center mb-0"></p>
             )}
         </Container>
     );
