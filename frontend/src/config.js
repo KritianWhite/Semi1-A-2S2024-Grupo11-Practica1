@@ -1,1 +1,1 @@
-export const path_lb ="http://localhost:4000";
+export const path_lb ="http://elb1-2147162087.us-east-2.elb.amazonaws.com";
