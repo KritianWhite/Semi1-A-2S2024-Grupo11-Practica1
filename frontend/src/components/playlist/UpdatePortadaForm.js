@@ -33,7 +33,7 @@ const UpdatePortadaForm = ({ onSubmit, onCancel, idPlayList }) => {
             return;
         }
 
-        let api_uri = path_lb = '/playlist/updatefoto';
+        let api_uri = path_lb + '/playlist/updatefoto';
         let data = { idplaylist: idPlayList, imagen: fileData };
 
         //actualizar foto en el servidor
