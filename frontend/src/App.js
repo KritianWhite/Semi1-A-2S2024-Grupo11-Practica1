@@ -18,6 +18,7 @@ import TrackLocation from "./pages/auxiliares/TrackLocation";
 import NotFound from "./pages/NotFound";
 import Reproductor from "./components/Reproductor";
 import Search from "./pages/Search";
+import MainContent from "./pages/auxiliares/MainContent";
 
 function App() {
   return (
@@ -25,20 +26,23 @@ function App() {
       <PlayerProvider>
         <Router>
           <TrackLocation />
-          <Routes>
-            <Route path="/" element={<Bienvenida />} />
-            <Route path="/Login" element={<LoginPage />} />
-            <Route path="/Registrarse" element={<RegistrarPage />} />
-            <Route path="/Inicio" element={<HomeAdmin />} />
-            <Route path="/Perfil" element={<Perfil />} />
-            <Route path="/Playlist" element={<Playlist />} />
-            <Route path="/Favoritos" element={<Favoritos />} />
-            <Route path="/Radio" element={<Radio />} />
-            <Route path="/dashboard-admin" element={<DashboardAdmin />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/404" element={<NotFound />} />
-            <Route path="*" element={<Navigate to="/404" />} />
-          </Routes>
+          <MainContent>
+
+            <Routes>
+              <Route path="/" element={<Bienvenida />} />
+              <Route path="/Login" element={<LoginPage />} />
+              <Route path="/Registrarse" element={<RegistrarPage />} />
+              <Route path="/Inicio" element={<HomeAdmin />} />
+              <Route path="/Perfil" element={<Perfil />} />
+              <Route path="/Playlist" element={<Playlist />} />
+              <Route path="/Favoritos" element={<Favoritos />} />
+              <Route path="/Radio" element={<Radio />} />
+              <Route path="/dashboard-admin" element={<DashboardAdmin />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/404" element={<NotFound />} />
+              <Route path="*" element={<Navigate to="/404" />} />
+            </Routes>
+          </MainContent>
           <Reproductor />
         </Router>
       </PlayerProvider>
