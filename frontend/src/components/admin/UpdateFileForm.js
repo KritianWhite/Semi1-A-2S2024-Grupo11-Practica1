@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import Alertas from '../Alertas';
+import { path_lb } from '../../config.js';
 
 const UpdateFileForm = ({ fileType, onSubmit, onCancel, accept, idSong }) => {
     const [fileData, setFileData] = useState('');
@@ -32,7 +33,7 @@ const UpdateFileForm = ({ fileType, onSubmit, onCancel, accept, idSong }) => {
             return;
         }
 
-        let api_uri = 'http://localhost:4000/song/';  
+        let api_uri = path_lb + '/song/';  
         let data = {};
         if (fileType === 'imagen') {
             api_uri += 'updateimage';

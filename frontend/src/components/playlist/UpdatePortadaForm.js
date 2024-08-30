@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import Alertas from '../Alertas';
+import { path_lb } from '../../config';
 
 const UpdatePortadaForm = ({ onSubmit, onCancel, idPlayList }) => {
     const [fileData, setFileData] = useState('');
@@ -32,7 +33,7 @@ const UpdatePortadaForm = ({ onSubmit, onCancel, idPlayList }) => {
             return;
         }
 
-        let api_uri = 'http://localhost:4000/playlist/updatefoto';
+        let api_uri = path_lb = '/playlist/updatefoto';
         let data = { idplaylist: idPlayList, imagen: fileData };
 
         //actualizar foto en el servidor

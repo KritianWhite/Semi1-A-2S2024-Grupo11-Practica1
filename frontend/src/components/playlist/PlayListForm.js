@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import Alertas from '../Alertas';
+import { path_lb } from '../../config';
 
 const PlayListForm = ({ initialData, onSubmit, onCancel, idUser }) => {
     const [formData, setFormData] = useState({
@@ -47,7 +48,7 @@ const PlayListForm = ({ initialData, onSubmit, onCancel, idUser }) => {
         } else {
             const createPlaylist = () => {
 
-                fetch('http://localhost:4000/playlist/create', {
+                fetch( path_lb + '/playlist/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -77,7 +78,7 @@ const PlayListForm = ({ initialData, onSubmit, onCancel, idUser }) => {
 
             const updatePlaylist = () => {
                 console.log("Entra a actualizar");
-                fetch('http://localhost:4000/playlist/modify', {
+                fetch( path_lb + '/playlist/modify', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

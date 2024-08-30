@@ -6,6 +6,7 @@ import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
 import TablaCanciones from '../components/TablaCanciones';
 import Alertas from '../components/Alertas';
+import { path_lb } from '../config';
 
 const Favoritos = () => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -27,7 +28,7 @@ const Favoritos = () => {
 
         setUserId(storedUserId);
         // realizamos una petición a la base de datos para obtener las canciones recientes
-        fetch('http://localhost:4000/favorites/getsongs', {
+        fetch( path_lb + '/favorites/getsongs', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -47,7 +48,7 @@ const Favoritos = () => {
 
     const handleToggleFavorite = (songId, es_favorito) => {
         // Realiza una petición a la base de datos para marcar o desmarcar la canción como favorita
-        let apiUri = `http://localhost:4000/favorites/`;
+        let apiUri = path_lb + `/favorites/`;
         if (es_favorito) {
             apiUri += 'removesong';
         } else {

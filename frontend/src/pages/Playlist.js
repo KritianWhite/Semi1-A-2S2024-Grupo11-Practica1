@@ -5,6 +5,7 @@ import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
 import PlayListCard from '../components/PlayListCard';
 import Alertas from '../components/Alertas';
+import { path_lb } from '../config';
 
 const Playlist = () => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -24,7 +25,7 @@ const Playlist = () => {
     const fetchSongs = async ({ idplaylist }) => {
         // Aquí realizarías la llamada a tu API para obtener las canciones
         console.log('Obteniendo canciones de la playlist con id:', idplaylist);
-        fetch ('http://localhost:4000/playlist/getsongs', {
+        fetch (path_lb + '/playlist/getsongs', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

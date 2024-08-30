@@ -4,6 +4,7 @@ import TablaCanciones from './TablaCanciones';
 import PlayListForm from './playlist/PlayListForm.js';
 import Alertas from './Alertas.js';
 import UpdatePortadaForm from './playlist/UpdatePortadaForm.js';
+import { path_lb } from '../config.js';
 
 const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
   const [showForm, setShowForm] = useState(false);
@@ -25,7 +26,7 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
     let storedUserId = storedAuthData.userId;
     const fetchPlaylists = async () => {
       try {
-        const response = await fetch('http://localhost:4000/playlist/getall', {
+        const response = await fetch( path_lb + '/playlist/getall', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -107,7 +108,7 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
   const handleDelete = (playlist) => {
     console.log(playlist);
     // Eliminar playlist
-    fetch('http://localhost:4000/playlist/delete', {
+    fetch( path_lb + '/playlist/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
