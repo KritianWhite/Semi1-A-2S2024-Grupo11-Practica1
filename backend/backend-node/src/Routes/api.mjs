@@ -21,6 +21,7 @@ router.post("/song/updateimage", song.updateImage);
 router.post("/song/updatemp3", song.updateMp3);
 router.post("/song/remove", song.remove);
 router.post("/song/lastest", song.lastest);
+router.post("/song/search", song.getall); //para obtener todas las canciones y saber si estan en favoritos
 
 /*****Playlists****/
 router.post("/playlist/create", playlist.create);

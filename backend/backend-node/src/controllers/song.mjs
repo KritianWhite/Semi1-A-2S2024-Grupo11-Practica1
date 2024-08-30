@@ -108,6 +108,29 @@ const list = async (req, res) => {
   }
 };
 
+const getall = async (req, res) => {
+  try {
+    const { idusuario } = req.body;
+    if (idusuario === undefined) {
+      return res.status(404).json({
+        status: 404,
+        message: "Solicitud incorrecta.",
+      });
+    }
+
+    let xsql = `select c.*, IF(f.id_usuario IS NOT NULL, 1, 0) as es_favorito from cancion c left join favorito f on c.id = f.id_cancion AND f.id_usuario = '${idusuario}';`;
+    let result = await consult(xsql);
+    if (result[0].status == 200) {
+      //return res.status(200).json({ canciones: result[0].result });
+      return res.status(200).json(result[0].result);
+    } else {
+      return res.status(500).json({ status: 500, message: result[0].message });
+    }
+  } catch (error) {
+    return res.status(500).json({ status: 500, message: error.message });
+  }
+};
+
 const modify = async (req, res) => {
   try {
     const { idcancion, nombre, duracion, artista } = req.body;
@@ -319,5 +342,6 @@ export const song = {
   updateImage,
   updateMp3,
   remove,
-  lastest
+  lastest,
+  getall
 };
