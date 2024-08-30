@@ -4,7 +4,7 @@ import ReactAudioPlayer from 'react-audio-player';
 import { Container, Row, Col, Image } from 'react-bootstrap';
 
 const Reproductor = () => {
-    const { currentSong } = useContext(PlayerContext);
+    const { currentSong, setPlayerHeight } = useContext(PlayerContext);
     const audioRef = useRef(null);
 
     useEffect(() => {
@@ -12,18 +12,26 @@ const Reproductor = () => {
             const audioElement = audioRef.current.audioEl.current;
             // Deshabilita las opciones de descarga, pantalla completa, y reproducción remota
             audioElement.setAttribute('controlsList', 'nodownload nofullscreen noremoteplayback');
-            
+
             // Opcionalmente, podrías aplicar CSS para intentar ocultar el menú de opciones, pero esto no es garantizado para todos los navegadores
             const moreOptionsButton = audioElement.parentElement.querySelector('.audio-more-options');
             if (moreOptionsButton) {
                 moreOptionsButton.style.display = 'none'; // Oculta el botón de más opciones si existe
             }
         }
-    }, [currentSong]);
+
+        // Actualiza la altura del reproductor cuando se monta o cambia la canción
+        if (currentSong) {
+            setPlayerHeight(150); // Ajusta la altura cuando hay una canción (este valor es solo un ejemplo)
+        } else {
+            setPlayerHeight(60); // Altura mínima cuando no hay canción
+        }
+
+    }, [currentSong, setPlayerHeight]);
 
     return (
-        <Container 
-            fluid 
+        <Container
+            fluid
             style={{
                 position: 'fixed',
                 bottom: 0,
@@ -40,9 +48,9 @@ const Reproductor = () => {
             {currentSong ? (
                 <Row style={{ width: '100%' }} className="align-items-center">
                     <Col xs="auto">
-                        <Image 
-                            src={currentSong.url_caratula} 
-                            rounded 
+                        <Image
+                            src={currentSong.url_caratula}
+                            rounded
                             style={{
                                 width: '60px',
                                 height: '60px',
