@@ -26,7 +26,7 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
     let storedUserId = storedAuthData.userId;
     const fetchPlaylists = async () => {
       try {
-        const response = await fetch( path_lb + '/playlist/getall', {
+        const response = await fetch(path_lb + '/playlist/getall', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
   const handleDelete = (playlist) => {
     console.log(playlist);
     // Eliminar playlist
-    fetch( path_lb + '/playlist/delete', {
+    fetch(path_lb + '/playlist/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -137,102 +137,140 @@ const PlaylistGrid = ({ songs, fetchSongs, iduser }) => {
 
 
   return (
-    <Container>
-      {selectedPlaylist && showSongs ? (
-        <>
-          <Button variant="link" onClick={() => handleVolver()}>Volver</Button>
-          <TablaCanciones songs={songs} screen={'playlist'} playlistId={selectedPlaylist} removeSongFromPlayList={handleRemoveSong}/>
-        </>
-      ) : (
-        <>
-          <Row className="align-items-center mb-4">
-            <Col>
-              <h2>TUS PLAYLIST</h2>
-            </Col>
-            <Col className="text-end">
-              <Button variant="primary" onClick={handleShowCreateForm} style={{ width: '20vh' }}>
-                Crear Playlist
-              </Button>
-            </Col>
-          </Row>
-
-          <Row>
-            {playlists.map((playlist) => (
-              <Col key={playlist.id} xs={6} md={4} lg={3} className="mb-4">
-                <Card className="h-100 cursor-pointer" style={{ cursor: 'pointer' }}>
-                  <Card.Img variant="top" onClick={() => handlePlaylistClick(playlist.id)} src={playlist.url_portada} alt={playlist.nombre} />
-                  <Card.Body>
-                    <Card.Title onClick={() => handlePlaylistClick(playlist.id)}>{playlist.nombre}</Card.Title>
-                    <Card.Text onClick={() => handlePlaylistClick(playlist.id)}>{playlist.descripcion}</Card.Text>
-                    <Row>
-                      <Col></Col>
-                      <Col>
-                        <Button
-                          variant="button"
-                          title='Editar'
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(playlist);
-                          }}
-                        >
-                          <i className="bi bi-pencil-square"></i>
-                        </Button>
-                      </Col>
-                      <Col>
-                        <Button
-                          variant="button"
-                          title='Cambiar Portada'
-                          onClick={(e) => { e.stopPropagation(); handleShowUpdatePhotoForm(playlist); }}
-                        >
-                          <i className="bi bi-images"></i>
-                        </Button>
-                      </Col>
-                      <Col>
-                        <Button
-                          variant="button"
-                          title='Eliminar'
-                          onClick={(e) => { e.stopPropagation(); handleDelete(playlist); }}
-                        >
-                          <i className="bi bi-trash"></i>
-                        </Button>
-                      </Col>
-
-                    </Row>
-                  </Card.Body>
-                </Card>
+    <>
+      <Container>
+        {selectedPlaylist && showSongs ? (
+          <>
+            <Button variant="link" onClick={() => handleVolver()}>Volver</Button>
+            <TablaCanciones
+              songs={songs}
+              screen={'playlist'}
+              playlistId={selectedPlaylist}
+              removeSongFromPlayList={handleRemoveSong}
+            />
+          </>
+        ) : (
+          <>
+            <Row className="align-items-center mb-4">
+              <Col>
+                <h2>TUS PLAYLIST</h2>
               </Col>
-            ))}
-          </Row>
+              <Col className="text-end">
+                <Button
+                  variant="primary"
+                  onClick={handleShowCreateForm}
+                  style={{ width: '20vh' }}
+                >
+                  Crear Playlist
+                </Button>
+              </Col>
+            </Row>
 
-          <Modal show={showForm} onHide={() => handleCancel()}>
-            <Modal.Header closeButton>
-              <Modal.Title>{selectedPlaylist ? 'Actualizar Playlist' : 'Nueva Playlist'}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <PlayListForm
-                initialData={selectedPlaylist}
-                onSubmit={handleCreateOrUpdate}
-                onCancel={() => handleCancel()}
-                idUser={iduser}
-              />
-            </Modal.Body>
-          </Modal>
+            <Row>
+              {playlists.map((playlist) => (
+                <Col key={playlist.id} xs={6} md={4} lg={3} className="mb-4">
+                  <div
+                    className="playlist-card h-100"
+                    style={{ cursor: 'pointer', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}
+                    onClick={() => handlePlaylistClick(playlist.id)}
+                  >
+                    <div className="playlist-img" style={{ height: '200px', overflow: 'hidden' }}>
+                      <img
+                        src={playlist.url_portada}
+                        alt={playlist.nombre}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </div>
+                    <div className="playlist-body" style={{ padding: '16px' }}>
+                      <h5
+                        className="playlist-title"
+                        onClick={() => handlePlaylistClick(playlist.id)}
+                        style={{ marginBottom: '8px' }}
+                      >
+                        {playlist.nombre}
+                      </h5>
+                      <p
+                        className="playlist-description"
+                        onClick={() => handlePlaylistClick(playlist.id)}
+                        style={{ color: '#666', marginBottom: '16px' }}
+                      >
+                        {playlist.descripcion}
+                      </p>
+                      <Row>
+                        <Col></Col>
+                        <Col>
+                          <Button
+                            variant="button"
+                            title='Editar'
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(playlist);
+                            }}
+                          >
+                            <i className="bi bi-pencil-square"></i>
+                          </Button>
+                        </Col>
+                        <Col>
+                          <Button
+                            variant="button"
+                            title='Cambiar Portada'
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleShowUpdatePhotoForm(playlist);
+                            }}
+                          >
+                            <i className="bi bi-images"></i>
+                          </Button>
+                        </Col>
+                        <Col>
+                          <Button
+                            variant="button"
+                            title='Eliminar'
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(playlist);
+                            }}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </Button>
+                        </Col>
+                      </Row>
+                    </div>
+                  </div>
+                </Col>
+              ))}
+            </Row>
 
-          <Modal show={showUpdatePhotoForm} onHide={() => handleCancel()}>
-            <Modal.Header closeButton>
-              <Modal.Title>Actualizar Foto</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <UpdatePortadaForm
-                onSubmit={handleUpdatePhoto}
-                onCancel={() => handleCancel()}
-                idPlayList={selectedPlaylist ? selectedPlaylist.id : null}
-              />
-            </Modal.Body>
-          </Modal>
-        </>
-      )}
-    </Container>
+            <Modal show={showForm} onHide={() => handleCancel()}>
+              <Modal.Header closeButton>
+                <Modal.Title>{selectedPlaylist ? 'Actualizar Playlist' : 'Nueva Playlist'}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <PlayListForm
+                  initialData={selectedPlaylist}
+                  onSubmit={handleCreateOrUpdate}
+                  onCancel={() => handleCancel()}
+                  idUser={iduser}
+                />
+              </Modal.Body>
+            </Modal>
+
+            <Modal show={showUpdatePhotoForm} onHide={() => handleCancel()}>
+              <Modal.Header closeButton>
+                <Modal.Title>Actualizar Foto</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <UpdatePortadaForm
+                  onSubmit={handleUpdatePhoto}
+                  onCancel={() => handleCancel()}
+                  idPlayList={selectedPlaylist ? selectedPlaylist.id : null}
+                />
+              </Modal.Body>
+            </Modal>
+          </>
+        )}
+      </Container>
+    </>
   );
 };
 

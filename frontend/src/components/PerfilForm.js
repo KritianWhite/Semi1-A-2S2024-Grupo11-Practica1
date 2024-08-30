@@ -149,7 +149,7 @@ const PerfilForm = ({ data }) => {
     <div>
       <Card style={{ borderRadius: '10px', padding: '15px', backgroundColor: '#F8F9FA', position: 'relative', minWidth: '700px' }}>
         <Card.Body>
-          <Card.Title style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px' }}>
+          <Card.Title style={{ fontSize: '24px', fontWeight: 'bold'}}>
             PERFIL DE USUARIO
             <Button
               variant="link"
