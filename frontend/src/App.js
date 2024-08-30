@@ -17,6 +17,7 @@ import DashboardAdmin from "./pages/DashboardAdmin";
 import TrackLocation from "./pages/auxiliares/TrackLocation";
 import NotFound from "./pages/NotFound";
 import Reproductor from "./components/Reproductor";
+import Search from "./pages/Search";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
             <Route path="/Favoritos" element={<Favoritos />} />
             <Route path="/Radio" element={<Radio />} />
             <Route path="/dashboard-admin" element={<DashboardAdmin />} />
+            <Route path="/search" element={<Search />} />
             <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<Navigate to="/404" />} />
           </Routes>

@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
+import React, {useContext, useEffect, useState } from 'react';
 import { Container, Col } from 'react-bootstrap';
 
 import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
 import RadioCard from '../components/RadioCard';
+import { PlayerContext } from '../context/PlayerContext';
+import { path_lb } from '../config';
 
 const Radio = () => {
+    const { resetSong } = useContext(PlayerContext); // Importa la función playSong del contexto
     const [isExpanded, setIsExpanded] = useState(false);
+    const [songs, setSongs] = useState([]);
     const { isAdmin } = UseAuth();
 
-    const songs = [
-        { idsong: 1, nombre: 'Dance of the Mommoths', artista: 'The Whole Other', duracion: '1:50' },
-        { idsong: 2, nombre: 'Luxery', artista: 'Caustic', duracion: '3:03' },
-        { idsong: 3, nombre: 'Regrets', artista: 'Caustic', duracion: '3:17' },
-        { idsong: 4, nombre: 'Project', artista: 'Patrick Patrikios', duracion: '3:30' },
-    ];
+    useEffect(() => {
+        resetSong(); // Detener la reproducción de la canción actual
+        // Realizar petición a la base de datos para obtener todas las canciones
+        fetch( path_lb + '/song/list')
+            .then(response => response.json())
+            .then(data => {
+                setSongs(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }, []);
 
     return (
         <>

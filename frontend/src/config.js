@@ -1,0 +1,1 @@
+export const path_lb ="http://localhost:4000";

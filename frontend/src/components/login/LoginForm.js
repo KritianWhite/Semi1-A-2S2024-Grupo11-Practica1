@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 import  useAuth  from '../../pages/auxiliares/UseAuth';
 import  Alertas  from '../Alertas';
+import { path_lb } from '../../config';
 
 const LoginForm = () => {
     const [email, setUsername] = useState('');
@@ -18,7 +19,7 @@ const LoginForm = () => {
             password
         };
 
-        fetch('http://localhost:4000/user/login', {
+        fetch( path_lb + '/user/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

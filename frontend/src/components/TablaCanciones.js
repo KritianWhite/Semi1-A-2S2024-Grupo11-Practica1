@@ -3,6 +3,7 @@ import { Table, Button, Container, Row, Col, Modal } from 'react-bootstrap';
 import { PlayerContext } from '../context/PlayerContext'; // Asegúrate de que la ruta sea correcta
 import Alertas from './Alertas';
 import AddToPlaylistForm from './playlist/AddToPlaylistForm';
+import { path_lb } from '../config';
 
 const TablaCanciones = ({ songs, userId, onToggleFavorite, screen, playlistId, removeSongFromPlayList }) => {
   const { playSong } = useContext(PlayerContext); // Importa la función playSong del contexto
@@ -32,7 +33,7 @@ const TablaCanciones = ({ songs, userId, onToggleFavorite, screen, playlistId, r
     console.log('Eliminando canción de la playlist', idCancion);
     console.log('Playlist:', playlistId);
     // Realiza una petición a la base de datos para eliminar la canción de la playlist
-    fetch('http://localhost:4000/playlist/removesong', {
+    fetch( path_lb + '/playlist/removesong', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

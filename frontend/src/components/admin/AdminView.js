@@ -5,6 +5,7 @@ import SongForm from './SongForm';
 import SongDetails from './SongDetails';
 import UpdateFileForm from './UpdateFileForm';
 import Alertas from '../Alertas';
+import { path_lb } from '../../config.js';
 
 const AdminView = () => {
     const [songs, setSongs] = useState([]);
@@ -16,7 +17,7 @@ const AdminView = () => {
     useEffect(() => {
         const fetchSongs = async () => {
             try {
-                const response = await fetch('http://localhost:4000/song/list', {
+                const response = await fetch(path_lb + '/song/list', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -84,7 +85,7 @@ const AdminView = () => {
 
     const handleDelete = (songId) => {
         // Eliminar la canción del servidor
-        fetch('http://localhost:4000/song/remove', {
+        fetch(path_lb + '/song/remove', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
