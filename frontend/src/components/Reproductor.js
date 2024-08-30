@@ -1,126 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, ProgressBar } from 'react-bootstrap';
+import React, { useContext, useRef, useEffect } from 'react';
+import { PlayerContext } from '../context/PlayerContext';
+import ReactAudioPlayer from 'react-audio-player';
+import { Container, Row, Col, Image } from 'react-bootstrap';
 
 const Reproductor = () => {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [isLiked, setIsLiked] = useState(false);
-    const duration = 220; // Duración de la canción en segundos
+    const { currentSong } = useContext(PlayerContext);
+    const audioRef = useRef(null);
 
     useEffect(() => {
-        let interval = null;
-        if (isPlaying) {
-            interval = setInterval(() => {
-                setCurrentTime((prevTime) => {
-                    if (prevTime < duration) {
-                        return prevTime + 1;
-                    } else {
-                        clearInterval(interval);
-                        return prevTime;
-                    }
-                });
-            }, 1000);
-        } else if (!isPlaying && currentTime !== 0) {
-            clearInterval(interval);
+        if (audioRef.current && audioRef.current.audioEl.current) {
+            const audioElement = audioRef.current.audioEl.current;
+            // Deshabilita las opciones de descarga, pantalla completa, y reproducción remota
+            audioElement.setAttribute('controlsList', 'nodownload nofullscreen noremoteplayback');
+            
+            // Opcionalmente, podrías aplicar CSS para intentar ocultar el menú de opciones, pero esto no es garantizado para todos los navegadores
+            const moreOptionsButton = audioElement.parentElement.querySelector('.audio-more-options');
+            if (moreOptionsButton) {
+                moreOptionsButton.style.display = 'none'; // Oculta el botón de más opciones si existe
+            }
         }
-        return () => clearInterval(interval);
-    }, [isPlaying, currentTime, duration]);
-
-    const handlePlayPause = () => {
-        setIsPlaying(!isPlaying);
-    };
-
-    const handleProgressChange = (event) => {
-        const boundingRect = event.target.getBoundingClientRect();
-        const clickPosition = event.clientX - boundingRect.left;
-        const progressBarWidth = boundingRect.width;
-        const newTime = (duration * clickPosition) / progressBarWidth;
-        setCurrentTime(Math.max(0, Math.min(newTime, duration))); // Aseguramos que el tiempo esté dentro de los límites
-    };
-
-    const handleLike = () => {
-        setIsLiked(!isLiked);
-    };
-
-    const formatTime = (time) => {
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    };
+    }, [currentSong]);
 
     return (
-        <Container fluid className="bg-light py-3">
-            <Row className="align-items-center">
-                <Col xs={2}>
-                    {/* Imagen del álbum */}
-                    <img
-                        src="https://ew.com/thmb/4bHTaBOHh6vEoPdHRYqWniwucD8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/freshprince-2000-3721b9e6bf09448ba6ef0210319ccfa1.jpg"
-                        alt="Album Art"
-                        style={{ width: '80px', height: '80px', borderRadius: '10px' }}
-                    />
-                </Col>
-                <Col xs={4} className="text-start">
-                    <div>Song Name</div>
-                    <div className="text-muted">Artist Name</div>
-                </Col>
-                <Col xs={6}>
-                    <Row>
-                        <Col xs={10} style={{ position: 'relative' }}>
-                            <ProgressBar
-                                now={(currentTime / duration) * 100}
-                                className="mb-2"
-                                style={{ height: '5px', cursor: 'pointer' }}
-                                onMouseDown={handleProgressChange}
-                            />
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    top: '1px',  // Ajustamos la posición vertical
-                                    left: `${(currentTime / duration) * 100}%`,
-                                    transform: 'translateX(0%) translateY(-50%)',  // Ajuste de transformación (desplazamiento del puntero)
-                                    width: '12px',
-                                    height: '12px',
-                                    backgroundColor: 'red',
-                                    borderRadius: '50%',
-                                    pointerEvents: 'none',
-                                }}
-                            ></div>
-                            <div className="d-flex justify-content-between">
-                                <span>{formatTime(currentTime)}</span>
-                                <span>{formatTime(duration)}</span>
-                            </div>
-                        </Col>
-                        <Col xs={2} className="text-end">
-                            <i
-                                className={`bi bi-heart${isLiked ? '-fill' : ''}`}
-                                style={{ color: isLiked ? 'red' : 'black', cursor: 'pointer' }}
-                                onClick={handleLike}
-                            ></i>
-                        </Col>
-                    </Row>
-                    <Row className="mt-2">
-                        <Col xs={2} className="text-center">
-                            <i className="bi bi-shuffle" style={{ cursor: 'pointer' }}></i>
-                        </Col>
-                        <Col xs={2} className="text-center">
-                            <i className="bi bi-skip-backward-fill" style={{ cursor: 'pointer' }}></i>
-                        </Col>
-                        <Col xs={2} className="text-center">
-                            <i
-                                className={`bi bi-${isPlaying ? 'pause' : 'play'}-fill`}
-                                style={{ cursor: 'pointer' }}
-                                onClick={handlePlayPause}
-                            ></i>
-                        </Col>
-                        <Col xs={2} className="text-center">
-                            <i className="bi bi-skip-forward-fill" style={{ cursor: 'pointer' }}></i>
-                        </Col>
-                        <Col xs={2} className="text-center">
-                            <i className="bi bi-arrow-repeat" style={{ cursor: 'pointer' }}></i>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
+        <Container 
+            fluid 
+            style={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: '#282c34',
+                color: 'white',
+                padding: '10px',
+                boxShadow: '0px -2px 10px rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center'
+            }}
+        >
+            {currentSong ? (
+                <Row style={{ width: '100%' }} className="align-items-center">
+                    <Col xs="auto">
+                        <Image 
+                            src={currentSong.url_caratula} 
+                            rounded 
+                            style={{
+                                width: '60px',
+                                height: '60px',
+                                objectFit: 'cover',
+                                borderRadius: '5px'
+                            }}
+                            alt={currentSong.nombre}
+                        />
+                    </Col>
+                    <Col style={{ flex: 1, marginLeft: '10px' }}>
+                        <h5 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>{currentSong.nombre}</h5>
+                        <p style={{ margin: 0, fontSize: '14px', color: '#d3d3d3' }}>{currentSong.artista}</p>
+                        <ReactAudioPlayer
+                            src={currentSong.url_mp3}
+                            autoPlay
+                            controls
+                            ref={audioRef}
+                            style={{ width: '100%', marginTop: '10px' }}
+                        />
+                    </Col>
+                </Row>
+            ) : (
+                <p className="text-center mb-0"></p>
+            )}
         </Container>
     );
 };

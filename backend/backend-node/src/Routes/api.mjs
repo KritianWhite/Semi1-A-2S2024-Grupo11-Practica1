@@ -21,12 +21,14 @@ router.post("/song/updateimage", song.updateImage);
 router.post("/song/updatemp3", song.updateMp3);
 router.post("/song/remove", song.remove);
 router.post("/song/lastest", song.lastest);
+router.post("/song/search", song.getall); //para obtener todas las canciones y saber si estan en favoritos
 
 /*****Playlists****/
 router.post("/playlist/create", playlist.create);
 router.post("/playlist/getall", playlist.getall);
 router.post("/playlist/modify", playlist.modify);
-router.post("/playlist/delete", playlist.deletesong);
+router.post("/playlist/updatefoto", playlist.updatefoto);
+router.post("/playlist/delete", playlist.deleteplaylist);
 router.post("/playlist/addsong", playlist.addsong);
 router.post("/playlist/removesong", playlist.removesong);
 router.post("/playlist/getsongs", playlist.getsongs);

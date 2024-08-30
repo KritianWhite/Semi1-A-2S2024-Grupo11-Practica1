@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Col } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Container, Col, Form } from 'react-bootstrap';
 import { useLocation, Navigate } from 'react-router-dom';
 
 import UseAuth from './auxiliares/UseAuth';
@@ -7,11 +7,11 @@ import Sidebar from '../components/Sidebar';
 import TablaCanciones from '../components/TablaCanciones';
 import Alertas from '../components/Alertas';
 
-const Favoritos = () => {
-    const [isExpanded, setIsExpanded] = useState(false);
+const HomePage = () => {
     const [songs, setSongs] = useState([]);
+    const [songsFiltradas, setSongsFiltradas] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [userid, setUserId] = useState();
-
     const { isAdmin, hasAccessToRoute } = UseAuth();
     const location = useLocation();
 
@@ -26,13 +26,13 @@ const Favoritos = () => {
         let storedUserId = storedAuthData.userId;
 
         setUserId(storedUserId);
-        // realizamos una petición a la base de datos para obtener las canciones recientes
-        fetch('http://localhost:4000/favorites/getsongs', {
+        // Realizamos una petición a la base de datos para obtener todas las canciones
+        fetch('http://localhost:4000/song/search', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ iduser: storedAuthData.userId }),
+            body: JSON.stringify({ idusuario: storedAuthData.userId }),
         })
             .then((response) => response.json())
             .then((data) => {
@@ -62,15 +62,17 @@ const Favoritos = () => {
         })
             .then((response) => response.json())
             .then((data) => {
-                if (data.status !== 200) {
-                    console.log(data);
-                    Alertas.showToast(data.message, 'error');
-                    return;
-                }
-                console.log(data);
                 Alertas.showToast(data.message, 'success');
                 // Actualiza la lista de canciones para reflejar el cambio en la interfaz
-                let updatedSongs = songs.map((song) => {
+                let updatedSongs = songsFiltradas.map((song) => {
+                    if (song.id === songId) {
+                        return { ...song, es_favorito: !es_favorito };
+                    }
+                    return song;
+                });
+                setSongsFiltradas(updatedSongs);
+
+                updatedSongs = songs.map((song) => {
                     if (song.id === songId) {
                         return { ...song, es_favorito: !es_favorito };
                     }
@@ -84,6 +86,22 @@ const Favoritos = () => {
             });
     }
 
+    const handleSearch = (event) => {
+        const term = event.target.value.toLowerCase();
+        setSearchTerm(term);
+        if (term === '') {
+            setSongsFiltradas([]);
+            return;
+        }
+
+        const filteredSongs = songs.filter(song =>
+            song.nombre.toLowerCase().includes(term) ||
+            song.artista.toLowerCase().includes(term)
+        );
+
+        setSongsFiltradas(filteredSongs);
+    }
+
     return (
         <>
             <Container>
@@ -91,16 +109,28 @@ const Favoritos = () => {
                     <Sidebar isAdmin={isAdmin} />
                 </Col>
                 <Col xs="auto">
-                    {/* Aquí va contenido principal */}
-                    <h1>TUS FAVORITOS</h1>
-                    <div className="d-flex justify-content-center align-items-center">
-                        <TablaCanciones songs={songs} onToggleFavorite={handleToggleFavorite} userId={userid} screen={'favorites'} />
-                    </div>
+                    <h1 className="mb-4">¿Qué quieres reproducir?</h1>
+                    
+                    {/* Barra de búsqueda */}
+                    <Form.Control
+                        type="text"
+                        placeholder="Buscar por nombre o autor..."
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        className="mb-4"
+                    />
+
+                    {songsFiltradas.length === 0 ? (
+                        <p></p>
+                    ) : (
+                        <div className="d-flex justify-content-center align-items-center">
+                            <TablaCanciones songs={songsFiltradas} onToggleFavorite={handleToggleFavorite} userId={userid} screen={'home'} />
+                        </div>
+                    )}
                 </Col>
-                            
             </Container>
         </>
     );
 }
 
-export default Favoritos;
+export default HomePage;

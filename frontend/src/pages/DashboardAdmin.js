@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Col } from 'react-bootstrap';
 import { useLocation, Navigate } from 'react-router-dom';
 
 import UseAuth from './auxiliares/UseAuth';
@@ -18,24 +18,16 @@ const DashboardAdmin = () => {
 
     return (
         <>
-            <Container fluid>
-                <Row>
-                    <Col xs={isExpanded ? 3 : 1}
-                        className={`p-0 transition-col sidebar-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
-                        onMouseEnter={() => setIsExpanded(true)}
-                        onMouseLeave={() => setIsExpanded(false)} 
-                        style={{ transition: 'all 0.5s ease-in-out' }}>
-                        <Sidebar isAdmin={isAdmin} />
-                    </Col>
-                    <Col
-                        xs={isExpanded ? 9 : 11}
-                        className={`transition-col content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
-                        style={{ transition: 'all 0.5s ease-in-out', overflowX: 'hidden', marginBottom: '20vh'}}
-                    >
+            <Container>
+                <Col xs="auto">
+                    <Sidebar isAdmin={isAdmin} />
+                </Col>
+                <Col xs="auto">
+                    <div className="d-flex justify-content-center align-items-center">
                         {/* Aquí va contenido principal */}
                         <AdminView />
-                    </Col>
-                </Row>
+                    </div>
+                </Col>
             </Container>
         </>
     );
