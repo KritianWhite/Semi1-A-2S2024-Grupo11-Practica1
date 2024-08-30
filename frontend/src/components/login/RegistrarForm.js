@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { path_lb } from '../../config';
 
 import Alertas from '../Alertas';
 
@@ -53,7 +54,7 @@ function RegisterForm() {
     } else {
       setErrors({});
       // Petición a la API para registrar al usuario
-      fetch('http://localhost:4000/user/register', {
+      fetch( path_lb + '/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

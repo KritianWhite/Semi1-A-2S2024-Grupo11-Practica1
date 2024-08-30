@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Modal, Button, ListGroup, Row, Col, Image } from 'react-bootstrap';
 import Alertas from '../Alertas';
+import { path_lb } from '../../config';
 
 const AddToPlaylistForm = ({ onSubmit, idCancion }) => {
     const [playlists, setPlaylists] = useState([]);
@@ -14,7 +15,7 @@ const AddToPlaylistForm = ({ onSubmit, idCancion }) => {
         setIdUser(storedUserId);
         const fetchPlaylists = async () => {
             try {
-                const response = await fetch('http://localhost:4000/playlist/getall', {
+                const response = await fetch( path_lb + '/playlist/getall', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -40,7 +41,7 @@ const AddToPlaylistForm = ({ onSubmit, idCancion }) => {
     const handleAddToPlaylist = (idPlaylist) => {
         //hacemos la petición al servidor
 
-        let api_uri = 'http://localhost:4000/playlist/addsong';
+        let api_uri = path_lb + '/playlist/addsong';
         let data = { iduser: idUser, idplaylist: idPlaylist, idsong: idCancion };
 
         fetch(api_uri, {

@@ -3,6 +3,7 @@ import { Card, Row, Col, ListGroup, Button, Form } from 'react-bootstrap';
 import Alertas from './Alertas';
 import UpdatePhotoModal from './UpdatePhotoModal';
 import './styles/PerfilForm.css';
+import { path_lb } from '../config';
 
 const PerfilForm = ({ data }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -32,7 +33,7 @@ const PerfilForm = ({ data }) => {
   };
 
   const handleSavePhoto = () => { //funcion para consultar la api y obtener la nueva foto
-    fetch(`http://localhost:4000/user/getuser`, {
+    fetch(path_lb + `/user/getuser`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ const PerfilForm = ({ data }) => {
     //guardamos el id del usuario
     setUserId(storedAuthData.userId);
     //obtenemos la informacion del usuario haciendo una peticion al servidor
-    fetch(`http://localhost:4000/user/getuser`, {
+    fetch(path_lb + `/user/getuser`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,7 +99,7 @@ const PerfilForm = ({ data }) => {
       return;
     }
     // Guardar cambios de datos editados en la base de datos
-    fetch(`http://localhost:4000/user/update`, {
+    fetch(path_lb + `/user/update`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
