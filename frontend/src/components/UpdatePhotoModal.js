@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import './styles/UpdatePhotoModal.css';
 import Alertas from './Alertas';
+import { path_lb } from '../config';
 
 const UpdatePhotoModal = ({ isOpen, onClose, onSave, dataUsuario, idUsuario }) => {
   const [errors, setErrors] = useState({}); //errors del formulario
@@ -68,7 +69,7 @@ const UpdatePhotoModal = ({ isOpen, onClose, onSave, dataUsuario, idUsuario }) =
       email: dataUsuario.email
     };
 
-    fetch('http://localhost:4000/user/updatephoto', {
+    fetch( path_lb + '/user/updatephoto', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

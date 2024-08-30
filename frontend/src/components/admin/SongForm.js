@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import Alertas from '../Alertas';
+import { path_lb } from '../../config.js';
 
 const SongForm = ({ initialData, onSubmit, onCancel }) => {
     const [formData, setFormData] = useState({
@@ -51,7 +52,7 @@ const SongForm = ({ initialData, onSubmit, onCancel }) => {
         } else {
             const createSong = () => {
 
-                fetch('http://localhost:4000/song/create', {
+                fetch(path_lb + '/song/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -83,7 +84,7 @@ const SongForm = ({ initialData, onSubmit, onCancel }) => {
 
             const updateSong = () => {
                 console.log("Entra a actualizar");
-                fetch('http://localhost:4000/song/modify', {
+                fetch( path_lb + '/song/modify', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

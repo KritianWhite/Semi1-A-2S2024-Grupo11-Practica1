@@ -5,6 +5,7 @@ import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
 import RadioCard from '../components/RadioCard';
 import { PlayerContext } from '../context/PlayerContext';
+import { path_lb } from '../config';
 
 const Radio = () => {
     const { resetSong } = useContext(PlayerContext); // Importa la función playSong del contexto
@@ -15,7 +16,7 @@ const Radio = () => {
     useEffect(() => {
         resetSong(); // Detener la reproducción de la canción actual
         // Realizar petición a la base de datos para obtener todas las canciones
-        fetch('http://localhost:4000/song/list')
+        fetch( path_lb + '/song/list')
             .then(response => response.json())
             .then(data => {
                 setSongs(data);
