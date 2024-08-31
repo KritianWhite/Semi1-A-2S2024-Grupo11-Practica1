@@ -5,8 +5,7 @@ from database.database import consult
 from config import config
 import re
 import base64
-import boto3
-from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+from s3 import uploadImageS3, deleteObjectS3
 
 def login():
     try:
@@ -86,7 +85,6 @@ def registro():
         else:
             return jsonify({"status": 500, "message": "Email ya ha sido registrado"}), 500
     except Exception as e:
-        print("entro a error")
         return jsonify({"status": 500, "message": str(e)}), 500
 
 def getuser():
@@ -152,7 +150,6 @@ def update():
         else:
             return jsonify({"status": 500, "message": "error usuario no existe"}), 500
     except Exception as e:
-        print(e)
         return jsonify({"status": 500, "message": str(e)}), 500
     
 def updatephoto():
@@ -201,41 +198,21 @@ def updatephoto():
 
         xsql = f"UPDATE usuario SET url_imagen = '{url_imagen}' WHERE id = {user_id};"
 
-        result = consult(xsql)
+        result2 = consult(xsql)
 
-        if result[0]['status'] == 200:
+        if result2[0]['status'] == 200:
+            #borrar imagen anterior
+            modify = deleteObjectS3(result[0]['result'][0]['url_imagen'])
+            if modify is None:
+                return jsonify({"status": 500, "message": "Error al borrar la imagen anterior"}), 500
+
             return jsonify({"status":200, "message": "Foto actualizada"}), 200
         else:
             return jsonify({"status": 500, "message": result[0]['message']}), 500
     except Exception as e:
-        print(e)
         return jsonify({"status": 500, "message": str(e)}), 500
     
-def uploadImageS3(buff, path):
-    # Configuración del cliente S3
-    s3_client = boto3.client(
-        's3',
-        region_name = config["region"], 
-        aws_access_key_id = config["accessKeyId"],
-        aws_secret_access_key = config["secretAccessKey"]
-    )
-
-    try:
-        # Subir la imagen a S3
-        response = s3_client.put_object(
-            Bucket= config["bucket"],  # Reemplaza con el nombre de tu bucket
-            Key=path,
-            Body=buff,
-            ContentType='image/jpeg'
-        )
-        return response
-    except (NoCredentialsError, PartialCredentialsError) as e:
-        print("Error de credenciales:", e)
-        return None
-    except Exception as e:
-        print("Error al subir la imagen:", e)
-        return None
-    
+  
 user = {
     "login": login,
     "registro": registro,

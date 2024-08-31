@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from config import config
 from controllers.user import user
 from controllers.song import song
@@ -7,6 +7,10 @@ from controllers.playlist import playlist
 
 api_blueprint = Blueprint('api', __name__)
 
+# Comprobar
+@api_blueprint.route('/check', methods=['GET'])
+def check():
+    return jsonify({"status": 200, "message": "API Funcionando correctamente"}), 200
 
 # Usuario
 @api_blueprint.route('/user/login', methods=['POST'])
@@ -42,9 +46,25 @@ def song_list():
 def song_modify():
     return song['modify']()
 
+@api_blueprint.route('/song/updateimage', methods=['POST'])
+def song_updateimage():
+    return song['updateimage']()
+
+@api_blueprint.route('/song/updatemp3', methods=['POST'])
+def song_updatemp3():
+    return song['updatemp3']()
+
 @api_blueprint.route('/song/remove', methods=['POST'])
 def song_remove():
     return song['remove']()
+
+@api_blueprint.route('/song/lastest', methods=['POST'])
+def song_lastest():
+    return song['lastest']()
+
+@api_blueprint.route('/song/search', methods=['POST'])
+def song_search():
+    return song['search']()
 
 # Playlists
 @api_blueprint.route('/playlist/create', methods=['POST'])
@@ -61,7 +81,7 @@ def playlist_modify():
 
 @api_blueprint.route('/playlist/delete', methods=['POST'])
 def playlist_delete():
-    return playlist['deletesong']()
+    return playlist['deleteplaylist']()
 
 @api_blueprint.route('/playlist/addsong', methods=['POST'])
 def playlist_addsong():
@@ -74,6 +94,10 @@ def playlist_removesong():
 @api_blueprint.route('/playlist/getsongs', methods=['POST'])
 def playlist_getsongs():
     return playlist['getsongs']()
+
+@api_blueprint.route('/playlist/updatefoto', methods=['POST'])
+def playlist_updatefoto():
+    return playlist['updatefoto']()
 
 # Favoritos
 @api_blueprint.route('/favorites/addsong', methods=['POST'])

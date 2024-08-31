@@ -1,5 +1,5 @@
 import { consult } from "../database/database.mjs";
-import { uploadImageS3 } from "../s3.mjs";
+import { uploadImageS3, deleteObjectS3 } from "../s3.mjs";
 import config from "../config.mjs";
 
 const create = async (req, res) => {
@@ -31,10 +31,8 @@ const create = async (req, res) => {
 
     const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
 
-    //eliminar los espacios en blanco y los puntos
-    const nombreSinEspacios = nombre.replace(/\s/g, '').replace(/\./g, '');
 
-    const path = `Fotos/${nombreSinEspacios + fechaHoraNumerica}.jpg`;
+    const path = `Playlist/${nombreSinEspacios + fechaHoraNumerica}.jpg`;
 
     const response = await uploadImageS3(buff, path);
 
@@ -57,7 +55,6 @@ const create = async (req, res) => {
       return res.status(500).json({ status: 500, message: result[0].message });
     }
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
   }
 };
@@ -105,6 +102,7 @@ const modify = async (req, res) => {
     );
 
     if (result[0].status == 200 && result[0].result.length > 0) {
+
       result = await consult(`update playlist set nombre = '${nombre}',
          descripcion = '${descripcion}' where id = '${idplaylist}' and id_user = '${iduser}';`);
       if (result[0].status == 200) {
@@ -120,7 +118,6 @@ const modify = async (req, res) => {
         .json({ status: 500, message: "error playlist no existe" });
     }
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
   }
 };
@@ -152,9 +149,11 @@ const updatefoto = async (req, res) => {
       const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
 
       //eliminar los espacios en blanco y los puntos
-      const path = `Fotos/playlist${idplaylist + fechaHoraNumerica}.jpg`;
+      const nombreSinEspacios = check[0].result[0].nombre.replace(/\s/g, '').replace(/\./g, '');
 
-      const response = await uploadImageS3(buff, path);
+      const path = `Playlist/${nombreSinEspacios + fechaHoraNumerica}.jpg`;
+
+      let response = await uploadImageS3(buff, path);
 
       if (response == null){
         return res.status(500).json({ status: 500, message: "Error al subir la imagen" });
@@ -165,6 +164,12 @@ const updatefoto = async (req, res) => {
       const result = await consult(`update playlist set url_portada = '${url_portada}' where id = '${idplaylist}';`);
 
       if(result[0].status == 200){
+
+        response = await deleteObjectS3(check[0].result[0].url_portada);
+        if(response == null){
+          return res.status(500).json({ status: 500, message: "Error al eliminar la imagen antigua" });
+        }
+
         return res.status(200).json({ status: 200, message: "Imagen actualizada", url: url_portada });
       }else{
         return res.status(500).json({ status: 500, message: result[0].message });
@@ -186,19 +191,30 @@ const deleteplaylist = async (req, res) => {
       });
     }
 
-    const result = await consult(
-      `update playlist set eliminada = 1 where id = '${idplaylist}';`
-    );
+  
+    let result = await consult(`select url_portada from playlist where id = '${idplaylist}';`);
+    if(result[0].status == 200 && result[0].result.length > 0){
 
-    if (result[0].status == 200 && result[0].result.affectedRows > 0) {
-      return res.status(200).json({status:200, message: "Playlist eliminada" });
-    } else {
-      return res
-        .status(500)
-        .json({ status: 500, message: "error playlist no se eliminó" });
+      //esto no es necesario, ya que solo estamos ocultando la playlist por lo cual la imagen puede quedarse
+      //por para que no ocupe espacio en el s3 vamos a eliminar, aunque no es necesario
+      let response = await deleteObjectS3(result[0].result[0].url_portada);
+      if(response == null){
+        return res.status(500).json({ status: 500, message: "Error al eliminar la imagen" });
+      }
+      //----------------------------------------------
+
+      result = await consult(`update playlist set eliminada = 1 where id = '${idplaylist}';`);
+
+      if (result[0].status == 200 && result[0].result.affectedRows > 0) {
+        return res.status(200).json({status:200, message: "Playlist eliminada" });
+      }
     }
+
+    return res
+    .status(500)
+    .json({ status: 500, message: "error playlist no se eliminó" });
+    
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
   }
 };
@@ -289,7 +305,6 @@ const removesong = async (req, res) => {
         .json({ status: 500, message: "canción no se pudo elminar de playlist" });
     }
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
   }
 };

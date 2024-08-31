@@ -8,7 +8,7 @@ const router = Router();
 
 /****Comprobación***/
 router.get("/check", async (req, res) => {
-    res.status(200).json({"status": 200, "message": "Comprobación correcta"});
+    res.status(200).json({"status": 200, "message": "API Funcionando correctamente"});
 });
 
 /*****Usuario****/

@@ -1,7 +1,10 @@
 from datetime import timedelta
+import datetime
 from flask import request, jsonify
 from database.database import consult
-
+from s3 import uploadImageS3, deleteObjectS3
+import base64
+from config import config
 
 def convert_timedelta_to_string(timedelta_obj):
     """Convert a timedelta object to a string in the format HH:MM:SS."""
@@ -18,30 +21,43 @@ def serialize_timedelta(result):
                 row[key] = convert_timedelta_to_string(value)
     return result
 
-
 def create():
     try:
-        data = request.json
+        data = request.get_json()
         iduser = data.get('iduser')
         nombre = data.get('nombre')
         descripcion = data.get('descripcion')
         portada = data.get('portada')
 
-        if iduser is None or nombre is None or descripcion is None or portada is None:
+        if not all([iduser, nombre, descripcion, portada]):
             return jsonify({
                 'status': 404,
-                'message': "Solicitud incorrecta. Por favor, rellene todos los campos."
+                'message': 'Solicitud incorrecta. Por favor, rellene todos los campos.'
             }), 404
+        
+        base64_data = portada.split(",")[1]
+        buffer = base64.b64decode(base64_data)
+        fecha_hora_actual = datetime.datetime.now()
+        fecha_hora_numerica = fecha_hora_actual.strftime('%Y%m%d%H%M%S')
+
+        nombre_sin_espacios = nombre.replace(" ", "").replace(".", "")
+        path_image = f"Playlist/{nombre_sin_espacios}{fecha_hora_numerica}.jpg"
+
+        if not uploadImageS3(buffer, path_image):
+            return jsonify({'status':500, 'message':'Error al subir imagen en S3'}), 500
+        
+        url_portada = f"https://{config['bucket']}.s3.{config['region']}.amazonaws.com/{path_image}"
 
         query = f"""
         INSERT INTO playlist (nombre, descripcion, url_portada, id_user, eliminada) 
-        VALUES ('{nombre}', '{descripcion}', '{portada}', '{iduser}', 0);
+        VALUES ('{nombre}', '{descripcion}', '{url_portada}', '{iduser}', 0);
         """
-        print(query)
         result = consult(query)
 
         if result[0]['status'] == 200:
-            return jsonify({ 'message': "Playlist creada" }), 200
+            # aqui no se puede hacer: const idplaylist = result[0].result.insertId;
+            response = consult(f"SELECT id FROM playlist WHERE nombre = '{nombre}' AND url_portada = '{url_portada}' AND id_user = '{iduser}' AND eliminada = 0;")
+            return jsonify({'status':200, 'message': "Playlist creada", 'id': response[0]['result'][0]['id'] }), 200
         else:
             return jsonify({ 'status': 500, 'message': result[0]['message'] }), 500
     except Exception as e:
@@ -49,7 +65,7 @@ def create():
 
 def getall():
     try:
-        data = request.json
+        data = request.get_json()
         iduser = data.get('iduser')
 
         if iduser is None:
@@ -65,9 +81,8 @@ def getall():
         
 
         query = f"""
-        SELECT id AS idplaylist, nombre, descripcion, url_portada AS portada
-        FROM playlist
-        WHERE id_user = '{iduser}' AND eliminada = 0;
+        select id, nombre, descripcion, url_portada
+        from playlist where id_user = '{iduser}' and eliminada = 0;
         """
         result = consult(query)
 
@@ -80,17 +95,16 @@ def getall():
 
 def modify():
     try:
-        data = request.json
+        data = request.get_json()
         iduser = data.get('iduser')
         idplaylist = data.get('idplaylist')
         nombre = data.get('nombre')
         descripcion = data.get('descripcion')
-        portada = data.get('portada')
 
-        if iduser is None or idplaylist is None or nombre is None or descripcion is None or portada is None:
+        if not all([iduser, idplaylist, nombre, descripcion]):
             return jsonify({
                 'status': 404,
-                'message': "Solicitud incorrecta. Por favor, rellene todos los campos."
+                'message': 'Solicitud incorrecta. Por favor, rellene todos los campos.'
             }), 404
 
         check_query = f"""
@@ -102,13 +116,13 @@ def modify():
         if result[0]['status'] == 200 and len(result[0]['result']) > 0:
             update_query = f"""
             UPDATE playlist 
-            SET nombre = '{nombre}', descripcion = '{descripcion}', url_portada = '{portada}' 
+            SET nombre = '{nombre}', descripcion = '{descripcion}' 
             WHERE id = '{idplaylist}' AND id_user = '{iduser}';
             """
             result = consult(update_query)
 
             if result[0]['status'] == 200:
-                return jsonify({ 'message': "Playlist modificada" }), 200
+                return jsonify({ 'status': 200, 'message': "Playlist modificada" }), 200
             else:
                 return jsonify({ 'status': 500, 'message': result[0]['message'] }), 500
         else:
@@ -116,34 +130,73 @@ def modify():
     except Exception as e:
         return jsonify({ 'status': 500, 'message': str(e) }), 500
 
-def deletesong():
+def updatefoto():
     try:
-        data = request.json
-        iduser = data.get('iduser')
+        data = request.get_json()
+        idplaylist = data.get('idplaylist')
+        imagen = data.get('imagen')
+
+        if not all([idplaylist, imagen]):
+            return jsonify({'status':404, 'message':'Solicitud incorrecta. Por favor, rellene todos los campos.'}), 404
+
+        result = consult(f"SELECT * FROM playlist WHERE id = '{idplaylist}';")
+
+        if result[0]['status'] == 200 and len(result[0]['result']) > 0:
+            base64_data = imagen.split(",")[1]
+            buffer = base64.b64decode(base64_data)
+            fecha_hora_actual = datetime.datetime.now()
+            fecha_hora_numerica = fecha_hora_actual.strftime('%Y%m%d%H%M%S')
+
+            nombre_sin_espacios = result[0]['result'][0]['nombre'].replace(" ", "").replace(".", "")
+            path = f"Playlist/{nombre_sin_espacios}{fecha_hora_numerica}.jpg"
+
+            if not uploadImageS3(buffer, path):
+                return jsonify({'status':500, 'message':"Error al subir imagen en S3"}), 500
+
+            url_portada= f"https://{config['bucket']}.s3.{config['region']}.amazonaws.com/{path}"
+            
+            response = consult(f"update playlist set url_portada = '{url_portada}' WHERE id = {idplaylist};")
+            
+            if response[0]['status'] == 200:
+                modify = deleteObjectS3(result[0]['result'][0]['url_portada'])
+                if not modify:
+                    return jsonify({'status':401, 'message': 'Error al eliminar imagen anterior'}), 500
+
+                return jsonify({'status':200, 'message': 'Imagen de canción actualizada', 'url': url_portada}), 200
+
+        return jsonify({'status':500, 'message':'Error, canción no existe'}), 500
+
+    except Exception as e:
+        return jsonify({'status':500, 'message':str(e)}), 500
+
+def deleteplaylist():
+    try:
+        data = request.get_json()
         idplaylist = data.get('idplaylist')
 
-        if iduser is None or idplaylist is None:
+        if idplaylist is None:
             return jsonify({
                 'status': 404,
-                'message': "Solicitud incorrecta. Por favor, rellene todos los campos."
+                'message': 'Solicitud incorrecta. Por favor, rellene todos los campos.'
             }), 404
 
-        check = consult(f"SELECT EXISTS (SELECT 1 FROM playlist WHERE id = '{idplaylist}' AND id_user = '{iduser}') AS songExists;")
-        if check[0]['status'] == 200 and check[0]['result'][0]['songExists'] == 0:
-            return jsonify({ 'status': 500, 'message': "Playlist/usuario no existe" }), 500
-        
+        result = consult(f"SELECT * FROM playlist WHERE id = '{idplaylist}'")
+        if result[0]['status'] == 200 and len(result[0]['result']) > 0:
 
-        query = f"""
-        UPDATE playlist 
-        SET eliminada = 1 
-        WHERE id = '{idplaylist}' AND id_user = '{iduser}';
-        """
-        result = consult(query)
+            #esto no es necesario, ya que solo estamos ocultando la playlist por lo cual la imagen puede quedarse
+            #por para que no ocupe espacio en el s3 vamos a eliminar, aunque no es necesario
+            response = deleteObjectS3(result[0]['result'][0]['url_portada'])
+            if not response:
+                return jsonify({ 'status': 500, 'message': "Error al eliminar imagen" }), 500
+            #---------------------------------------------------
 
-        if result[0]['status'] == 200 :
-            return jsonify({ 'message': "Playlist eliminada" }), 200
-        else:
-            return jsonify({ 'status': 500, 'message': "Error: Playlist no se eliminó" }), 500
+            query = f"""UPDATE playlist SET eliminada = 1 WHERE id = '{idplaylist}';"""
+            result = consult(query)
+
+            if result[0]['status'] == 200 :
+                return jsonify({'status':200, 'message': "Playlist eliminada" }), 200
+            else:
+                return jsonify({ 'status': 500, 'message': "Error: Playlist no se eliminó" }), 500
     except Exception as e:
         return jsonify({ 'status': 500, 'message': str(e) }), 500
 
@@ -189,7 +242,7 @@ def addsong():
                 result = consult(insert_query)
 
                 if result[0]['status'] == 200:
-                    return jsonify({ 'message': "Canción añadida a playlist" }), 200
+                    return jsonify({'status':200, 'message': "Canción añadida a playlist" }), 200
                 else:
                     return jsonify({ 'status': 500, 'message': result[0]['message'] }), 500
             else:
@@ -220,7 +273,7 @@ def removesong():
         result = consult(query)
 
         if result[0]['status'] == 200:
-            return jsonify({ 'message': "Canción eliminada de playlist" }), 200
+            return jsonify({ 'status': 200, 'message': "Canción eliminada de playlist" }), 200
         else:
             return jsonify({ 'status': 500, 'message': "Canción no se pudo eliminar de playlist" }), 500
     except Exception as e:
@@ -238,10 +291,10 @@ def getsongs():
             }), 404
 
         query = f"""
-        SELECT ca.id AS idsong, ca.nombre, ca.url_caratula AS url_imagen, ca.duracion, ca.artista, ca.url_mp3
-        FROM cancionplaylist
-        INNER JOIN cancion AS ca ON ca.id = cancionplaylist.id_cancion
-        WHERE cancionplaylist.id_playlist = '{idplaylist}';
+        select ca.id, ca.nombre, ca.url_caratula, ca.duracion, ca.artista, ca.url_mp3
+        from cancionplaylist as caply
+        INNER JOIN cancion as ca on ca.id = caply.id_cancion
+        where caply.id_playlist = '{idplaylist}';
         """
         result = consult(query)
 
@@ -249,7 +302,8 @@ def getsongs():
             serialized_result = serialize_timedelta(result[0]['result'])
             return jsonify(serialized_result), 200
         else:
-            return jsonify({ 'status': 500, 'message': "No se pudo obtener las canciones de la playlist" }), 500
+            return jsonify([]), 200
+            #return jsonify({ 'status': 500, 'message': "No se pudo obtener las canciones de la playlist" }), 500
     except Exception as e:
         return jsonify({ 'status': 500, 'message': str(e) }), 500
 
@@ -257,8 +311,9 @@ playlist = {
     'create': create,
     'getall': getall,
     'modify': modify,
-    'deletesong': deletesong,
+    'deleteplaylist': deleteplaylist,
     'addsong': addsong,
     'removesong': removesong,
-    'getsongs': getsongs
+    'getsongs': getsongs,
+    'updatefoto': updatefoto
 }
