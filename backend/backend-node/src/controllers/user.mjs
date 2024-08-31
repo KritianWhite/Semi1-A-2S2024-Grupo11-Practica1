@@ -1,7 +1,7 @@
 import * as bcrypt from "bcrypt";
 import { consult } from "../database/database.mjs";
 import config from "../config.mjs";
-import { uploadImageS3 } from "../s3.mjs";
+import { uploadImageS3, deleteObjectS3 } from "../s3.mjs";
 
 const login = async (req, res) => {
   try {
@@ -258,6 +258,14 @@ const updatephoto = async (req, res) => {
       xsql = `update usuario set url_imagen = '${url_imagen}' where id = ${id};`;
       const result2 = await consult(xsql);
       if (result2[0].status == 200) {
+
+        const modif = await deleteObjectS3(result[0].result[0].url_imagen);
+        if (modif == null) {
+          return res
+            .status(500)
+            .json({ status: 500, message: "Error al eliminar imagen anterior" });
+        }
+
         return res.status(200).json({ status: 200, message: "Foto de perfil actualizada" });
       } else {
         return res

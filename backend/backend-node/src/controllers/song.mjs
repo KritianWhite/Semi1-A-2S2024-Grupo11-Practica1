@@ -1,5 +1,5 @@
 import { consult } from "../database/database.mjs";
-import { uploadImageS3, uploadMP3S3 } from "../s3.mjs";
+import { uploadImageS3, uploadMP3S3, deleteObjectS3 } from "../s3.mjs";
 import config from "../config.mjs";
 
 const create = async (req, res) => {
@@ -108,29 +108,6 @@ const list = async (req, res) => {
   }
 };
 
-const getall = async (req, res) => {
-  try {
-    const { idusuario } = req.body;
-    if (idusuario === undefined) {
-      return res.status(404).json({
-        status: 404,
-        message: "Solicitud incorrecta.",
-      });
-    }
-
-    let xsql = `select c.*, IF(f.id_usuario IS NOT NULL, 1, 0) as es_favorito from cancion c left join favorito f on c.id = f.id_cancion AND f.id_usuario = '${idusuario}';`;
-    let result = await consult(xsql);
-    if (result[0].status == 200) {
-      //return res.status(200).json({ canciones: result[0].result });
-      return res.status(200).json(result[0].result);
-    } else {
-      return res.status(500).json({ status: 500, message: result[0].message });
-    }
-  } catch (error) {
-    return res.status(500).json({ status: 500, message: error.message });
-  }
-};
-
 const modify = async (req, res) => {
   try {
     const { idcancion, nombre, duracion, artista } = req.body;
@@ -164,7 +141,6 @@ const modify = async (req, res) => {
         .json({ status: 500, message: "error cancion no existe" });
     }
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
   }
 };
@@ -200,7 +176,7 @@ const updateImage = async (req, res) => {
 
       const path = `Fotos/${nombreSinEspacios + fechaHoraNumerica}.jpg`;
 
-      const response = await uploadImageS3(buff, path);
+      let response = await uploadImageS3(buff, path);
 
       if (response == null) {
         return res
@@ -210,8 +186,16 @@ const updateImage = async (req, res) => {
 
       const url_caratula = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
 
-      result = await consult(`update cancion set url_caratula = '${url_caratula}' where id = ${idcancion};`);
-      if (result[0].status == 200) {
+      const result2 = await consult(`update cancion set url_caratula = '${url_caratula}' where id = ${idcancion};`);
+      if (result2[0].status == 200) {
+
+        response = await deleteObjectS3(result[0].result[0].url_caratula);
+        if (response == null) {
+          return res
+            .status(500)
+            .json({ status: 500, message: "Error al eliminar imagen en S3" });
+        }
+
         return res.status(200).json({status: 200, message: "Imagen de canción actualizada", url: url_caratula });
       } else {
         return res
@@ -256,7 +240,7 @@ const updateMp3 = async (req, res) => {
 
       const path = `Canciones/${nombreSinEspacios + fechaHoraNumerica}.mp3`;
 
-      const response = await uploadMP3S3(buff, path);
+      let response = await uploadMP3S3(buff, path);
 
       if (response == null) {
         return res
@@ -266,8 +250,16 @@ const updateMp3 = async (req, res) => {
 
       const url_mp3 = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
 
-      result = await consult(`update cancion set url_mp3 = '${url_mp3}' where id = ${idcancion};`);
-      if (result[0].status == 200) {
+      const result2 = await consult(`update cancion set url_mp3 = '${url_mp3}' where id = ${idcancion};`);
+      if (result2[0].status == 200) {
+
+        response = await deleteObjectS3(result[0].result[0].url_mp3);
+        if (response == null) {
+          return res
+            .status(500)
+            .json({ status: 500, message: "Error al eliminar mp3 en S3" });
+        }
+
         return res.status(200).json({status: 200, message: "MP3 de la canción actualizado", url: url_mp3 });
       } else {
         return res
@@ -295,9 +287,28 @@ const remove = async (req, res) => {
     y estan relacionadas por una llave foranea, entonces eliminó primero la canción de las tablas favoritos y playlist.
     El usuario no importa ya que no se eliminan usuarios en el proyecto.*/
   
-    let result = await consult(`delete from favorito where id_cancion = '${idcancion}';`);
-    result = await consult(`delete from cancionplaylist where id_cancion = '${idcancion}';`);
+    let result = await consult(`select *from cancion where id = '${idcancion}';`);
+    if (result[0].status == 200 && result[0].result.length == 0) {
+      return res.status(404).json({ status: 404, message: "Canción no existe" });
+    }
 
+    let response = await deleteObjectS3(result[0].result[0].url_caratula);
+    if (response == null) {
+      return res
+        .status(500)
+        .json({ status: 500, message: "Error al eliminar imagen en S3" });
+    }
+
+    response = await deleteObjectS3(result[0].result[0].url_mp3);
+    if (response == null) {
+      return res
+        .status(500)
+        .json({ status: 500, message: "Error al eliminar mp3 en S3" });
+    }
+    
+
+    result = await consult(`delete from favorito where id_cancion = '${idcancion}';`);
+    result = await consult(`delete from cancionplaylist where id_cancion = '${idcancion}';`);
     result = await consult(`delete from cancion where id = '${idcancion}';`);
 
     if (result[0].status == 200 && result[0].result.affectedRows > 0) {
@@ -326,6 +337,29 @@ const lastest = async (req, res) => { // retorna las ultimas canciones añadidas
     let xsql = `select c.*, IF(f.id_usuario IS NOT NULL, 1, 0) as es_favorito from cancion c left join favorito f on c.id = f.id_cancion AND f.id_usuario = '${idusuario}' order by c.id desc limit 10;`;
     let result = await consult(xsql);
     if (result[0].status == 200) {
+      return res.status(200).json(result[0].result);
+    } else {
+      return res.status(500).json({ status: 500, message: result[0].message });
+    }
+  } catch (error) {
+    return res.status(500).json({ status: 500, message: error.message });
+  }
+};
+
+const getall = async (req, res) => {
+  try {
+    const { idusuario } = req.body;
+    if (idusuario === undefined) {
+      return res.status(404).json({
+        status: 404,
+        message: "Solicitud incorrecta.",
+      });
+    }
+
+    let xsql = `select c.*, IF(f.id_usuario IS NOT NULL, 1, 0) as es_favorito from cancion c left join favorito f on c.id = f.id_cancion AND f.id_usuario = '${idusuario}';`;
+    let result = await consult(xsql);
+    if (result[0].status == 200) {
+      //return res.status(200).json({ canciones: result[0].result });
       return res.status(200).json(result[0].result);
     } else {
       return res.status(500).json({ status: 500, message: result[0].message });

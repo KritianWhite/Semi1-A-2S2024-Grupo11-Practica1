@@ -115,10 +115,8 @@ def getsongs():
             }), 500
 
         query = f"""
-        SELECT c.id AS idsong, c.nombre, c.url_caratula AS url_imagen, c.duracion, c.artista, c.url_mp3
-        FROM favorito
-        INNER JOIN cancion AS c ON favorito.id_cancion = c.id
-        WHERE favorito.id_usuario = {iduser};
+        SELECT c.id as id, c.nombre, c.url_caratula as url_caratula, c.duracion, c.artista, c.url_mp3, 1 as es_favorito 
+        FROM favorito INNER JOIN cancion as c ON favorito.id_cancion = c.id WHERE favorito.id_usuario = {iduser};
         """
         result = consult(query)
 

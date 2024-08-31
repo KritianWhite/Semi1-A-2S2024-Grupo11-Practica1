@@ -54,7 +54,6 @@ const removesong = async (req, res) => {
         .json({ status: 500, message: "canción no se pudo elminar de favoritos" });
     }
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
   }
 };
@@ -80,7 +79,6 @@ const getsongs = async (req, res) => {
         .json({ status: 500, message: "Error al obtener datos" });
     }
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
   }
 };
