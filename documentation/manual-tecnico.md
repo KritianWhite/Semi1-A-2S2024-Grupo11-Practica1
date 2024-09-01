@@ -12,7 +12,7 @@
 
 * Descripción: Esta arquitectura está diseñada para manejar solicitudes simultáneamente, distribuyendo el tráfico entre los servidores backend, asegurando que la aplicación web pueda atender a varios usuarios al mismo tiempo y el rendimiento sea óptimo. Esta arquitectura utiliza servicios de AWS para garantizar alta disponibilidad, escalabilidad y seguridad.
 
-![Img/arquitectura.jpg](Img/arquitectura.jpg)
+![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/arquitectura.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/arquitectura.jpg)
 
 La arquitectura consiste en varias capas, mediante el siguiente flujo con la solicitud desde el cliente hasta la base de datos o almacenamiento en la nube.
 
@@ -53,7 +53,7 @@ La arquitectura consiste en varias capas, mediante el siguiente flujo con la sol
 
 * Descripción: Este Diagrama representa de forma gráfica las principales entidades dentro del sistema y las relaciones entre ellas. Este modelo se utilizó para estructurar y organizar la base de datos, permitiendo comprender como interactúan los datos y se relacionan. 
 
-![Img/er.jpg](Img/er.jpg)
+![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/er.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/er.jpg)
 
 El diagrama adjunto muestra las principales entidades del sistema y cómo están relacionadas. 
 
@@ -74,36 +74,36 @@ Relaciones:
 * **Administrador-Seminario1**: Este usuario tiene acceso total a todos los recursos y servicios de AWS permite una gestión completa del entorno.
 * **Política asociada**: AdministratorAccess
 
-![Img/admin1.jpg](Img/admin1.jpg)
+![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/admin1.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/admin1.jpg)
 
 * S3
     * **Usuario-S3**: El usuario S3 esta dedicado a la gestion y acceso completo a los buckets y objetos almacenados en Amazon S3
     * **Política asociada**: AmazonS3FullAccess
 
-    ![Img/user_S31.jpg](Img/user_S31.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/user_S31.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/user_S31.jpg)
 
 * EC2
     *  **Backend-node**: El usuario backend-node tiene acceso completo a los recursos de EC2 es utilizado principalmente para lanzar instancias EC2 que ejecuten un backend en este caso un backend node .js.
     * **Política asociada**: AmazonEC2FullAccess
 
-    ![Img/user_node1.jpg](Img/user_node1.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/user_node1.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/user_node1.jpg)
 
     * **Backend-python**: El usuario backend-python tiene acceso completo a los recursos de EC2 es utilizado principalmente para lanzar instancias EC2 que ejecuten un backend en este caso un backend python.
     * **Política asociada**: AmazonEC2FullAccess
 
-    ![Img/user_python1.jpg](Img/user_python1.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/user_python1.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/user_python1.jpg)
 
 * Balanceador de carga
     * **Usuario-CBL**: Este usuario es se encarga de gestionar y configurar los balanceadores de carga (Elastic Load Balancers) en AWS.
     * **Política asociada**: ElasticLoadBalancingFullAccess
 
-    ![Img/user_CBL1.jpg](Img/user_CBL1.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/user_CBL1.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/user_CBL1.jpg)
 
 * RDS
     * **Usuario-RDS**: Es el usuario encargado de la gestión total de las bases de datos relacionales en Amazon RDS en este caso en la creación de una base de datos MYSQL.
     * **Política asociada**: AmazonRDSFullAccess
 
-    ![Img/user_RDS1.jpg](Img/user_RDS1.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/user_RDS1.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/user_RDS1.jpg)
 
 ## Configuración de cada servicio
 
@@ -114,59 +114,61 @@ Relaciones:
 * Configuración: Definir nombre de bucket
     * **sound-stream-semi1-seccion-g11 (Sitio web estático)**
 
-    ![Img/S30.jpg](Img/S30.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/S30.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/S30.jpg)
 
     * **multimedia-semi1-seccion-g11 (Multimedia)**
 
-    ![Img/S300.jpg](Img/S300.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/S300.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/S300.jpg)
     
     * **Bucket público**
 
-        ![Img/S31.jpg](Img/S31.jpg)
+        ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/S31.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/S31.jpg)
 
-        ![Img/S32.jpg](Img/S32.jpg)
+        ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/S32.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/S32.jpg)
 
 ### EC2
 
 * Descripción: Amazon EC2 (Elastic Compute Cloud) es un servicio que proporciona capacidad de cómputo en la nube de manera escalable. Permite lanzar y administrar instancias de servidores virtuales, ofreciendo control de infraestructura, desde selección del sistema operativo hasta la configuración de la red, facilitando la ejecución de aplicaciones y servicios en la nube.
 * Configuración: 
     * **backend-node**
+
         **Definir nombre**
 
-        ![Img/node0.jpg](Img/node0.jpg)
+        ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/node0.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/node0.jpg)
 
         **Definir AMI**
 
-        ![Img/node1.jpg](Img/node1.jpg)
+        ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/node1.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/node1.jpg)
 
         **Crear llaves de acceso SSH**
 
-        ![Img/nodekey.jpg](Img/nodekey.jpg)
+        ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/nodekey.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/nodekey.jpg)
 
         **Seleccionar llaves de acceso**
 
-        ![Img/node2.jpg](Img/node2.jpg)
+        ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/node2.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/node2.jpg)
 
         **Seleccionar grupo de seguridad**
 
-        ![Img/node3.jpg](Img/node3.jpg)
+        ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/node3.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/node3.jpg)
 
     * **backend-python**
+
         **Definir nombre**
 
-        ![Img/python0.jpg](Img/python0.jpg)
+        ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/python0.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/python0.jpg)
 
         **Definir AMI**
 
-        ![Img/python1.jpg](Img/python1.jpg)
+        ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/python1.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/python1.jpg)
 
         **Crear llaves de acceso SSH**
 
-        ![Img/pythonkey.jpg](Img/pythonkey.jpg)
+        ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/pythonkey.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/pythonkey.jpg)
 
         **Seleccionar llaves de acceso y grupo de seguridad**
 
-        ![Img/python2.jpg](Img/python2.jpg)        
+        ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/python2.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/python2.jpg)        
 
 ### Balanceador de carga
 
@@ -174,27 +176,27 @@ Relaciones:
 * Configuración: 
     **Definir tipo**
 
-    ![Img/load0.jpg](Img/load0.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load0.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load0.jpg)
 
     **Definir nombre**
 
-    ![Img/load1.jpg](Img/load1.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load1.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load1.jpg)
 
     **Seleccionar grupo de seguridad y definir agente de escucha**
 
-    ![Img/load2.jpg](Img/load2.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load2.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load2.jpg)
 
     **Comprobación de estado**
 
-    ![Img/load3.jpg](Img/load3.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load3.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load3.jpg)
 
     **Seleccionar instancias**
 
-    ![Img/load4.jpg](Img/load4.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load4.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load4.jpg)
 
     **Verificar resumen y crear**
 
-    ![Img/load5.jpg](Img/load5.jpg)
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load5.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/load5.jpg)
 
 
 ### RDS
@@ -203,35 +205,35 @@ Relaciones:
 * Configuración: 
     **Seleccionar método de creación y motor**
 
-    ![Img/RDS0.jpg](Img/RDS0.jpg) 
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS0.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS0.jpg) 
 
     **Seleccionar versión del motor de base de datos**
 
-    ![Img/RDS1.jpg](Img/RDS1.jpg) 
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS1.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS1.jpg) 
 
     **Seleccionar plantilla**
 
-    ![Img/RDS2.jpg](Img/RDS2.jpg) 
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS2.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS2.jpg) 
 
     **Definir identificador de la instancia RDS y credenciales**
 
-    ![Img/RDS3.jpg](Img/RDS3.jpg) 
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS3.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS3.jpg) 
 
     **Seleccionar clase de instancia**
 
-    ![Img/RDS4.jpg](Img/RDS4.jpg) 
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS4.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS4.jpg) 
 
     **Definir tipo de almacenamiento y capacidad**
 
-    ![Img/RDS5.jpg](Img/RDS5.jpg) 
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS5.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS5.jpg) 
 
     **Seleccionar grupo de seguridad**
 
-    ![Img/RDS6.jpg](Img/RDS6.jpg) 
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS6.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS6.jpg) 
 
     **Seleccionar autenticación a la base de datos**
     
-    ![Img/RDS7.jpg](Img/RDS7.jpg) 
+    ![https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS7.jpg](https://raw.githubusercontent.com/fernandofalla/Img/main/semi1p1/RDS7.jpg) 
 
 ## Conclusiones
 
