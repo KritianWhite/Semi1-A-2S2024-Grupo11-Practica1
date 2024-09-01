@@ -1,58 +1,99 @@
-import React, { useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Container, Col } from 'react-bootstrap';
 import { useLocation, Navigate } from 'react-router-dom';
 
 import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
 import TablaCanciones from '../components/TablaCanciones';
-import Reproductor from '../components/Reproductor';
+import Alertas from '../components/Alertas';
+import { path_lb } from '../config';
 
-const AdminPage = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const { userId, isAdmin, hasAccessToRoute } = UseAuth();
+const HomePage = () => {
+  const [songs, setSongs] = useState([]);
+  const [userid, setUserId] = useState();
+  const { isAdmin, hasAccessToRoute } = UseAuth();
   const location = useLocation();
 
-  // Si el usuario no tiene acceso a la ruta actual, redirige a una página de error o a la página principal
-  if (!hasAccessToRoute(location.pathname)) {
-    return <Navigate to="/404" />;
+  useEffect(() => {
+    // Si el usuario no tiene acceso a la ruta actual, redirige a una página de error o a la página principal
+    if (!hasAccessToRoute(location.pathname)) {
+      return <Navigate to="/404" />;
+    }
+
+    // Obtenemos el id del usuario almacenado en el localStorage
+    let storedAuthData = JSON.parse(localStorage.getItem('authData'));
+    let storedUserId = storedAuthData.userId;
+
+    setUserId(storedUserId);
+    // realizamos una petición a la base de datos para obtener las canciones recientes
+    fetch( path_lb + '/song/lastest', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idusuario: storedAuthData.userId }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setSongs(data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        Alertas.showToast('Ocurrió un error al intentar obtener las canciones', 'error');
+      });
+  }, []);
+
+  const handleToggleFavorite = (songId, es_favorito) => {
+    // Realiza una petición a la base de datos para marcar o desmarcar la canción como favorita
+    let apiUri = path_lb + `/favorites/`;
+    if (es_favorito) {
+      apiUri += 'removesong';
+    } else {
+      apiUri += 'addsong';
+    }
+    fetch(apiUri, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ iduser: userid, idsong: songId }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        Alertas.showToast(data.message, 'success');
+        // Actualiza la lista de canciones para reflejar el cambio en la interfaz
+        let updatedSongs = songs.map((song) => {
+          if (song.id === songId) {
+            return { ...song, es_favorito: !es_favorito };
+          }
+          return song;
+        });
+        setSongs(updatedSongs);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        Alertas.showToast('Ocurrió un error al intentar realizar la operación', 'error');
+      });
   }
-  const songs = [
-    { title: 'Dance of the Mommoths', artist: 'The Whole Other', genre: 'Cinematic', duration: '1:50' },
-    { title: 'Luxery', artist: 'Caustic', genre: 'Hip-Hop & Rap', duration: '3:03' },
-    { title: 'Regrets', artist: 'Caustic', genre: 'Hip-Hop & Rap', duration: '3:17' },
-    { title: 'Project', artist: 'Patrick Patrikios', genre: 'Dance & Electronic', duration: '3:30' },
-  ];
 
   return (
     <>
-      <Container fluid>
-        <Row>
-          <Col xs={isExpanded ? 3 : 1}
-            className={`p-0 transition-col sidebar-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
-            onMouseEnter={() => setIsExpanded(true)}
-            onMouseLeave={() => setIsExpanded(false)} style={{ transition: 'all 0.5s ease-in-out' }}>
-            <Sidebar isAdmin={isAdmin} />
-          </Col>
-          <Col
-            xs={isExpanded ? 9 : 11}
-            className={`transition-col content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
-            style={{ transition: 'all 0.5s ease-in-out', overflowX: 'hidden' }}
-          >
-            {/* Aquí va contenido principal */}
-            <h1>Bienvenido a SOUNDSTREAM</h1>
-            <div className="d-flex justify-content-center align-items-center min-vh-100" style={{ overflow: 'hidden' }}>
-              <TablaCanciones songs={songs} />
-            </div>
+              
 
-            {/* Reproductor fijo en la parte inferior */}
-            <div style={{ position: 'fixed', bottom: 0, left: isExpanded ? '250px' : '80px', right: 0, transition: 'left 0.5s ease-in-out', zIndex: 1000 }}>
-              <Reproductor />
-            </div>
-          </Col>
-        </Row>
+      <Container>
+        <Col xs="auto">
+          <Sidebar isAdmin={isAdmin} />
+        </Col>
+        <Col xs="auto">
+          <h1 className="mb-4">Bienvenido a SOUNDSTREAM</h1>
+          <h2 className="mb-4">Últimos Lanzamientos</h2>
+          <div className="d-flex justify-content-center align-items-center">
+            <TablaCanciones songs={songs} onToggleFavorite={handleToggleFavorite} userId={userid} screen={'home'} />
+          </div>
+        </Col>
       </Container>
     </>
   );
 }
 
-export default AdminPage;
+export default HomePage;

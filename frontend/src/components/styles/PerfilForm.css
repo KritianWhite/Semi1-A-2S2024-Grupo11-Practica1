@@ -1,0 +1,29 @@
+.image-container {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 50%; /* Esto hace la imagen circular */
+    width: 100px;
+    height: 100px; 
+    margin: 0 auto
+  }
+  .hover-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 50%;
+  }
+  
+  .image-container:hover .hover-text {
+    opacity: 1;
+  }

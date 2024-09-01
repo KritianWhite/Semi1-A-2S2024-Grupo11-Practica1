@@ -1,10 +1,7 @@
 import * as bcrypt from "bcrypt";
 import { consult } from "../database/database.mjs";
 import config from "../config.mjs";
-
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import fs from "fs";
-import path from "path";
+import { uploadImageS3, deleteObjectS3 } from "../s3.mjs";
 
 const login = async (req, res) => {
   try {
@@ -29,7 +26,7 @@ const login = async (req, res) => {
           iduser: result[0].result[0].id,
           role: result[0].result[0].id_tipo_usuario,
         };
-        return res.status(200).json(dataUser);
+        return res.status(200).json({ status: 200, iduser: dataUser.iduser, role: dataUser.role });
       } else {
         return res
           .status(409)
@@ -72,7 +69,17 @@ const registro = async (req, res) => {
       //subir imagen a S3
       const base64Data = imagen.replace(/^data:image\/\w+;base64,/, "");
       const buff = Buffer.from(base64Data, "base64");
-      const path = `Fotos/${email}.jpg`;
+      const fechaHoraActual = new Date();
+      const ano = fechaHoraActual.getFullYear().toString();
+      const mes = (fechaHoraActual.getMonth() + 1).toString().padStart(2, '0'); // Se agrega +1 porque los meses se indexan desde 0
+      const dia = fechaHoraActual.getDate().toString().padStart(2, '0');
+      const hora = fechaHoraActual.getHours().toString().padStart(2, '0');
+      const minutos = fechaHoraActual.getMinutes().toString().padStart(2, '0');
+      const segundos = fechaHoraActual.getSeconds().toString().padStart(2, '0');
+
+      const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
+
+      const path = `Fotos/${email + fechaHoraNumerica}.jpg`;
 
       const response = await uploadImageS3(buff, path);
 
@@ -150,13 +157,13 @@ const getuser = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { id, nombre, apellido, email, password } = req.body;
+    const { id, nombre, apellido, nacimiento, password } = req.body;
     if (
       id === undefined ||
       nombre === undefined ||
-      apellido === undefined ||      
-      email === undefined ||
-      password === undefined
+      apellido === undefined ||
+      password === undefined ||
+      nacimiento === undefined
     ) {
       return res.status(404).json({
         status: 404,
@@ -164,20 +171,22 @@ const update = async (req, res) => {
       });
     }
 
-    let xsql = `select *from usuario where id = '${id}'`;
-    const result = await consult(xsql);
-
-    if (result[0].status == 200 && result[0].result.length > 0) {
+    //verificar password
+    let resultCheck = await consult(
+      `SELECT * FROM usuario where id = '${id}'`
+    );
+    if (resultCheck[0].status == 200 && resultCheck[0].result.length > 0) { //si existe el usuario
       let checkPass = bcrypt.compareSync(
         password,
-        result[0].result[0].password
-      );
-      if (checkPass) {
-        xsql = `update usuario set nombre = '${nombre}', apellido = '${apellido}', email = '${email}' where id = ${id};`;
+        resultCheck[0].result[0].password
+      ); //comparamos el password
 
+      if (checkPass) {
+        //actualizar usuario
+        let xsql = `update usuario set nombre = '${nombre}', apellido = '${apellido}', nacimiento = '${nacimiento}' where id = ${id};`;
         const result = await consult(xsql);
         if (result[0].status == 200) {
-          return res.status(200).json({ message: "Usuario actualizado" });
+          return res.status(200).json({ status: 200, message: "Usuario actualizado" });
         } else {
           return res
             .status(500)
@@ -185,13 +194,13 @@ const update = async (req, res) => {
         }
       } else {
         return res
-          .status(500)
-          .json({ status: 500, message: "Password Incorrecto" });
+          .status(409)
+          .json({ status: 409, message: "Password Incorrecto" });
       }
     } else {
       return res
         .status(500)
-        .json({ status: 500, message: "error usuario no existe" });
+        .json({ status: 500, message: "usuario no existe" });
     }
   } catch (error) {
     console.log(error);
@@ -201,21 +210,40 @@ const update = async (req, res) => {
 
 const updatephoto = async (req, res) => {
   try {
-    const { id, email, imagen } = req.body;
-    if (id === undefined || email === undefined || imagen === undefined) {
+    const { id, email, imagen, password } = req.body;
+    if (id === undefined || email === undefined || imagen === undefined || password === undefined) {
       return res.status(404).json({
         status: 404,
         message: "Solicitud incorrecta. Por favor, rellene todos los campos.",
       });
     }
 
-    let xsql = `select *from usuario where id = '${id}'`;
+    let xsql = `select * from usuario where id = '${id}' and email = '${email}';`;
     const result = await consult(xsql);
 
-    if (result[0].status == 200 && result[0].result.length > 0) {      
+    if (result[0].status == 200 && result[0].result.length > 0) {
+      //verificamos el password
+      let checkPass = bcrypt.compareSync(password, result[0].result[0].password);
+
+      if (!checkPass) {
+        return res
+          .status(409)
+          .json({ status: 409, message: "Password Incorrecto" });
+      }
+
       const base64Data = imagen.replace(/^data:image\/\w+;base64,/, "");
       const buff = Buffer.from(base64Data, "base64");
-      const path = `Fotos/${email}.jpg`;
+      const fechaHoraActual = new Date();
+      const ano = fechaHoraActual.getFullYear().toString();
+      const mes = (fechaHoraActual.getMonth() + 1).toString().padStart(2, '0'); // Se agrega +1 porque los meses se indexan desde 0
+      const dia = fechaHoraActual.getDate().toString().padStart(2, '0');
+      const hora = fechaHoraActual.getHours().toString().padStart(2, '0');
+      const minutos = fechaHoraActual.getMinutes().toString().padStart(2, '0');
+      const segundos = fechaHoraActual.getSeconds().toString().padStart(2, '0');
+
+      const fechaHoraNumerica = `${ano}${mes}${dia}${hora}${minutos}${segundos}`;
+
+      const path = `Fotos/${email + fechaHoraNumerica}.jpg`;
 
       const response = await uploadImageS3(buff, path);
 
@@ -225,17 +253,24 @@ const updatephoto = async (req, res) => {
           .json({ status: 500, message: "Error al subir imagen en S3" });
       }
 
-      const url_imagen = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
+      let url_imagen = `https://${config.bucket}.s3.${config.region}.amazonaws.com/${path}`;
 
       xsql = `update usuario set url_imagen = '${url_imagen}' where id = ${id};`;
+      const result2 = await consult(xsql);
+      if (result2[0].status == 200) {
 
-      const result = await consult(xsql);
-      if (result[0].status == 200) {
-        return res.status(200).json({ message: "Imagen actualizada" });
+        const modif = await deleteObjectS3(result[0].result[0].url_imagen);
+        if (modif == null) {
+          return res
+            .status(500)
+            .json({ status: 500, message: "Error al eliminar imagen anterior" });
+        }
+
+        return res.status(200).json({ status: 200, message: "Foto de perfil actualizada" });
       } else {
         return res
           .status(500)
-          .json({ status: 500, message: result[0].message });
+          .json({ status: 500, message: result2[0].message });
       }
     } else {
       return res
@@ -245,32 +280,6 @@ const updatephoto = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
-  }
-};
-
-//recibe un buffer y lo sube a S3
-const uploadImageS3 = async (buff, path) => {
-  const client = new S3Client({
-    region: config.region,
-    credentials: {
-      accessKeyId: config.accessKeyId,
-      secretAccessKey: config.secretAccessKey,
-    },
-  });
-
-  const command = new PutObjectCommand({
-    Bucket: config.bucket,
-    Key: path,
-    Body: buff,
-    ContentType: "image/jpeg",
-  });
-
-  try {
-    const response = await client.send(command);
-    return response;
-  } catch (error) {
-    console.error(error);
-    return null;
   }
 };
 

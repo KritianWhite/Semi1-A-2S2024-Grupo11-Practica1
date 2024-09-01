@@ -1,0 +1,71 @@
+.welcome-page {
+    background-image: url('https://i.redd.it/8j16f7e41qb91.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+.welcome-box {
+    background-color: rgba(128, 128, 128, 0.7);
+    border-radius: 15px;
+    margin: 20px;
+    width: 70vh;
+    height: 40vh;
+    margin-bottom: 10vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.welcome-box h1,
+.welcome-box h2 {
+    font-weight: bold;
+    color: white;
+    margin: 0;
+    line-height: 1.2;
+    font-size: calc(2rem + 1vw);
+    /* Tamaño de fuente adaptable */
+}
+
+.welcome-box p {
+    color: white;
+    margin: 0 0 20px;
+    font-size: calc(1rem + 0.5vw);
+    /* Tamaño de fuente adaptable */
+}
+
+.welcome-box button {
+    align-self: flex-start;
+    font-size: calc(1rem + 0.5vw);
+    /* Tamaño del botón adaptable */
+}
+
+@media (max-width: 768px) {
+    .welcome-box {
+        width: 90%;
+        height: auto;
+        padding: 15px;
+    }
+
+    .welcome-box h1 {
+        font-size: 2rem;
+    }
+
+    .welcome-box h2 {
+        font-size: 1.5rem;
+    }
+
+    .welcome-box p {
+        font-size: 1rem;
+    }
+
+    .welcome-box button {
+        font-size: 1rem;
+    }
+}

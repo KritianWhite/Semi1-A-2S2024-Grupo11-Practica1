@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 import  useAuth  from '../../pages/auxiliares/UseAuth';
 import  Alertas  from '../Alertas';
+import { path_lb } from '../../config';
 
 const LoginForm = () => {
     const [email, setUsername] = useState('');
@@ -18,26 +19,30 @@ const LoginForm = () => {
             password
         };
 
-        fetch('http://localhost:4000/user/login', {
+        fetch( path_lb + '/user/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data)
         })
-            .then(response => response.json())
-            .then(data => {
-                if(data.role === 1){
-                    login(data.id, true);
-                    navigate('/Inicio');
-                }else if(data.role === 2){
-                    login(data.id, false);
-                    navigate('/Inicio');
+            .then((response) => response.json())
+            .then((data) => {
+                if(data.status !== 200){
+                    Alertas.showToast(data.message, 'error');
+                }else{
+                    if(data.role === 1){
+                        login(data.iduser, true);
+                        navigate('/Inicio');
+                    }else if(data.role === 2){
+                        login(data.iduser, false);
+                        navigate('/Inicio');
+                    }
                 }
             })
             .catch((error) => {
                 console.error('Error:', error);
-                Alertas.showToast('error', 'Ocurrío un error al iniciar sesión');
+                Alertas.showToast('Ocurrío un error al iniciar sesión', 'error');
         });
 
     };

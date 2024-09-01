@@ -1,36 +1,44 @@
-import React, { useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import React, {useContext, useEffect, useState } from 'react';
+import { Container, Col } from 'react-bootstrap';
 
 import UseAuth from './auxiliares/UseAuth';
 import Sidebar from '../components/Sidebar';
-import Reproductor from '../components/Reproductor';
+import RadioCard from '../components/RadioCard';
+import { PlayerContext } from '../context/PlayerContext';
+import { path_lb } from '../config';
 
 const Radio = () => {
+    const { resetSong } = useContext(PlayerContext); // Importa la función playSong del contexto
     const [isExpanded, setIsExpanded] = useState(false);
+    const [songs, setSongs] = useState([]);
     const { isAdmin } = UseAuth();
+
+    useEffect(() => {
+        resetSong(); // Detener la reproducción de la canción actual
+        // Realizar petición a la base de datos para obtener todas las canciones
+        fetch( path_lb + '/song/list')
+            .then(response => response.json())
+            .then(data => {
+                setSongs(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }, []);
 
     return (
         <>
-            <Container fluid>
-                <Row>
-                    <Col xs={isExpanded ? 3 : 1}
-                        className={`p-0 transition-col sidebar-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
-                        onMouseEnter={() => setIsExpanded(true)}
-                        onMouseLeave={() => setIsExpanded(false)} style={{ transition: 'all 0.5s ease-in-out' }}>
-                        <Sidebar isAdmin={isAdmin} />
-                    </Col>
-                    <Col xs={isExpanded ? 9 : 11}
-                        className={`transition-col content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`} style={{ transition: 'all 0.5s ease-in-out' }}>
-                        {/* Aquí va contenido principal */}
-                        <h1>Contenido Principal Radio</h1>
-                        <p>Este es el contenido de la página que se adapta al tamaño del sidebar.</p>
-
-                        {/* Reproductor fijo en la parte inferior */}
-                        <div style={{ position: 'fixed', bottom: 0, left: isExpanded ? '250px' : '80px', right: 0, transition: 'left 0.5s ease-in-out', zIndex: 1000 }}>
-                            <Reproductor />
-                        </div>
-                    </Col>
-                </Row>
+            <Container>
+                <Col xs="auto">
+                    <Sidebar isAdmin={isAdmin} />
+                </Col>
+                <Col xs="auto">
+                    {/* Aquí va contenido principal */}
+                    <h1>Radio SOUNDSTREAM</h1>
+                    <div className="d-flex justify-content-center align-items-center">
+                        <RadioCard songs={songs} />
+                    </div>
+                </Col>
             </Container>
         </>
     );

@@ -47,14 +47,13 @@ const removesong = async (req, res) => {
     const result = await consult(xsql);
 
     if (result[0].status == 200 && result[0].result.affectedRows > 0) {
-      return res.status(200).json({ message: "Canción eliminada de favoritos" });
+      return res.status(200).json({status:200, message: "Canción eliminada de favoritos" });
     } else {
       return res
         .status(500)
         .json({ status: 500, message: "canción no se pudo elminar de favoritos" });
     }
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
   }
 };
@@ -69,7 +68,7 @@ const getsongs = async (req, res) => {
       });
     }
 
-    const result = await consult(`SELECT c.id as idsong, c.nombre, c.url_caratula as url_imagen, c.duracion, c.artista, c.url_mp3 
+    const result = await consult(`SELECT c.id as id, c.nombre, c.url_caratula as url_caratula, c.duracion, c.artista, c.url_mp3, 1 as es_favorito 
       FROM favorito INNER JOIN cancion as c ON favorito.id_cancion = c.id WHERE favorito.id_usuario = ${iduser};`);
 
     if (result[0].status == 200) {
@@ -77,10 +76,9 @@ const getsongs = async (req, res) => {
     } else {
       return res
         .status(500)
-        .json({ status: 500, message: "canción no se pudo elminar de favoritos" });
+        .json({ status: 500, message: "Error al obtener datos" });
     }
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ status: 500, message: error.message });
   }
 };
